@@ -1,13 +1,11 @@
 import React from 'react';
+import RegistroPaciente from './pages/RegistroPaciente';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>Gabinete Psicológico</h1>
-        <p>Sistema de gestión - Frontend funcionando ✅</p>
-      </header>
+      <RegistroPaciente />
     </div>
   );
 }
