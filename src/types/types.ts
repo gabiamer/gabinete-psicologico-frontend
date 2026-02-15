@@ -39,11 +39,62 @@ export interface FormData {
 }
 
 export interface AntecedentesData {
+  // Situación actual
   ultimaVezBien: string;
   desarrolloSintomas: string;
   antecedentesFamiliares: string;
+
+  // Funciones orgánicas
   sueno: string;
   apetito: string;
   sed: string;
   defecacion: string;
+
+  
+  // Historia familiar
+  conQuienVive: string;
+  personaReferencia: string;
+  celularReferencia: string;
+  
+  // Padre
+  nombrePadre: string;
+  ocupacionPadre: string;
+  enfermedadPadre: string;
+  relacionPadre: string;
+  
+  // Madre
+  nombreMadre: string;
+  ocupacionMadre: string;
+  enfermedadMadre: string;
+  relacionMadre: string;
+  
+  // Hermanos
+  numeroHermanos: number | '';
+  relatoHermanos: string;
+
+  // Universidad
+  nivelSatisfaccion: number;
+  rendimiento: number;
+  estresUniversitario: number;
+  interaccionSocial: number;
+  cambioCarreras: string;
+  motivosCambio: string;
+  relatoUniversidad: string;
+  
+  // Hábitos
+  consumoAlcohol: string;
+  frecuenciaAlcohol: number;  // 1-5
+  
+  consumoTabaco: string;
+  frecuenciaTabaco: number;   // 1-5
+  
+  consumoDrogas: string;
+  frecuenciaDrogas: number;   // 1-5
+  
+  relatoAcusacionDetencion: string;
+
+  acuerdosEstablecidos: string;
+  proximaSesionFecha: string;
+  proximaSesionHora: string;
+  
 }
