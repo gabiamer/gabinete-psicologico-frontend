@@ -98,3 +98,59 @@ export interface AntecedentesData {
   proximaSesionHora: string;
   
 }
+
+
+export interface OrientacionVocacionalData {
+  // Datos personales
+  motivoConsulta: string;
+  actividadesHobbies: string;
+  cualidad1: string;
+  cualidad2: string;
+  cualidad3: string;
+  defecto1: string;
+  defecto2: string;
+  defecto3: string;
+  temasInteres: string;
+  ocupacionMadre: string;
+  ocupacionPadre: string;
+  ocupacionOtros: string;
+
+  // Estudios
+  mismaPrimaria: string; // "Si" o "No"
+  motivoCambioPrimaria: string;
+  mismaSecundaria: string; // "Si" o "No"
+  motivoCambioSecundaria: string;
+  
+  materiaInteresante1: string;
+  materiaInteresante2: string;
+  materiaInteresante3: string;
+  motivoMateriasInteresantes: string;
+  
+  materiaDesinteresante1: string;
+  materiaDesinteresante2: string;
+  materiaDesinteresante3: string;
+  motivoMateriasDesinteresantes: string;
+  
+  satisfaccionesEscuela: string;
+  relacionCompaneros: string;
+  relacionProfesores: string;
+
+  // Objetivos profesionales
+  planDespuesPreparatoria: string; // "estudiar", "trabajar", "estudiar_trabajar", "ninguno"
+  motivoPlanFuturo: string;
+  
+  carreraInteres1: string;
+  carreraInteres2: string;
+  carreraInteres3: string;
+  
+  carreraNoInteres1: string;
+  carreraNoInteres2: string;
+  carreraNoInteres3: string;
+  
+  factorEconomico: string;
+  apoyoFamiliar: string;
+  visionCincoAnos: string;
+  tipoTrabajosDeseados: string;
+  
+  observacionesEntrevistador: string;
+}
