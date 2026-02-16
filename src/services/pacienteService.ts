@@ -4,8 +4,27 @@ import { FormData, AntecedentesData } from '../types/types';
 
 export const pacienteService = {
   buscar: async (termino: string) => {
-    const response = await api.get(`/pacientes/buscar?q=${termino}`);
-    return response.data.data || response.data;
+    try {
+      // Buscar en pacientes universitarios
+      const responseUniversitarios = await api.get(`/pacientes/buscar?q=${termino}`);
+      const universitarios = (responseUniversitarios.data.data || responseUniversitarios.data || []).map((p: any) => ({
+        ...p,
+        tipo: 'universitario'
+      }));
+
+      // Buscar en pacientes externos
+      const responseExternos = await api.get(`/pacientes-externos/buscar?q=${termino}`);
+      const externos = (responseExternos.data.data || responseExternos.data || []).map((p: any) => ({
+        ...p,
+        tipo: 'externo'
+      }));
+
+      // Combinar ambos resultados
+      return [...universitarios, ...externos];
+    } catch (err) {
+      console.error('Error en búsqueda:', err);
+      return [];
+    }
   },
 
   crear: async (formData: FormData) => {

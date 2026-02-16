@@ -45,8 +45,12 @@ const BuscarPaciente: React.FC = () => {
     navigate('/registro-paciente-externo');
   };
 
-  const verHistorialPaciente = (pacienteId: number) => {
-    navigate(`/pacientes/${pacienteId}/historial`);
+  const verPaciente = (paciente: any) => {
+    if (paciente.tipo === 'universitario') {
+      navigate(`/pacientes/${paciente.id}/historial`);
+    } else {
+      navigate(`/pacientes-externos/${paciente.id}/orientacion-vocacional`);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -75,14 +79,14 @@ const BuscarPaciente: React.FC = () => {
 
             <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
               <div style={{ flex: 1 }}>
-                <label className="field-label">Nombre, Celular o Carnet de Identidad</label>
+                <label className="field-label">Nombre, Celular o Correo</label>
                 <input
                   type="text"
                   value={terminoBusqueda}
                   onChange={(e) => setTerminoBusqueda(e.target.value)}
                   onKeyPress={handleKeyPress}
                   className="input-academic"
-                  placeholder="Ej. Juan Pérez, 70123456, 1234567 LP"
+                  placeholder="Ej. Juan Pérez, 70123456, correo@ejemplo.com"
                   autoFocus
                 />
               </div>
@@ -109,7 +113,7 @@ const BuscarPaciente: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {resultados.map((paciente) => (
                   <div
-                    key={paciente.id}
+                    key={`${paciente.tipo}-${paciente.id}`}
                     style={{
                       padding: '16px',
                       border: '2px solid #e2e8f0',
@@ -121,26 +125,43 @@ const BuscarPaciente: React.FC = () => {
                     }}
                   >
                     <div>
-                      <div style={{ fontWeight: '600', fontSize: '16px', color: '#0f172a' }}>
-                        {paciente.paciente?.person?.primerNombre || ''} {paciente.paciente?.person?.segundoNombre || ''}{' '}
-                        {paciente.paciente?.person?.apellidoPaterno || ''} {paciente.paciente?.person?.apellidoMaterno || ''}
-                      </div>
-                      <div style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
-                        Celular: {paciente.paciente?.person?.celular || 'N/A'} | Edad: {paciente.paciente?.edad || 'N/A'} años | Semestre: {paciente.semestre || 'N/A'}
-                      </div>
-                      {paciente.ultimaSesion && (
-                        <div style={{ fontSize: '12px', color: '#3b82f6', marginTop: '4px' }}>
-                          Última sesión: {new Date(paciente.ultimaSesion).toLocaleDateString()}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ fontWeight: '600', fontSize: '16px', color: '#0f172a' }}>
+                          {paciente.paciente?.person?.primerNombre || ''} {paciente.paciente?.person?.segundoNombre || ''}{' '}
+                          {paciente.paciente?.person?.apellidoPaterno || ''} {paciente.paciente?.person?.apellidoMaterno || ''}
                         </div>
-                      )}
+                        {/* 👈 BADGE para identificar tipo */}
+                        <span style={{
+                          padding: '4px 12px',
+                          borderRadius: '12px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          backgroundColor: paciente.tipo === 'universitario' ? '#dbeafe' : '#fef3c7',
+                          color: paciente.tipo === 'universitario' ? '#1e40af' : '#92400e'
+                        }}>
+                          {paciente.tipo === 'universitario' ? '🎓 Universitario' : '📋 Orientación Vocacional'}
+                        </span>
+                      </div>
+                      
+                      <div style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
+                        {paciente.tipo === 'universitario' ? (
+                          <>
+                            Celular: {paciente.paciente?.person?.celular || 'N/A'} | Edad: {paciente.paciente?.edad || 'N/A'} años | Semestre: {paciente.semestre || 'N/A'}
+                          </>
+                        ) : (
+                          <>
+                            Celular: {paciente.paciente?.person?.celular || 'N/A'} | Edad: {paciente.paciente?.edad || 'N/A'} años | Escuela: {paciente.escuela || 'N/A'} | Año: {paciente.anio || 'N/A'}
+                          </>
+                        )}
+                      </div>
                     </div>
                     <button
                       type="button"
-                      onClick={() => verHistorialPaciente(paciente.id)}
+                      onClick={() => verPaciente(paciente)}
                       className="btn-submit"
                       style={{ minWidth: '150px' }}
                     >
-                      Ver Historial →
+                      {paciente.tipo === 'universitario' ? 'Ver Historial →' : 'Ver Entrevista →'}
                     </button>
                   </div>
                 ))}
@@ -159,7 +180,6 @@ const BuscarPaciente: React.FC = () => {
               + Registrar Paciente Universitario
             </button>
             
-            {/* 👈 NUEVO BOTÓN */}
             <button
               type="button"
               onClick={iniciarOrientacionVocacional}
@@ -170,7 +190,7 @@ const BuscarPaciente: React.FC = () => {
             </button>
           </div>
 
-          {/* 👈 NUEVA SECCIÓN INFORMATIVA */}
+          {/* SECCIÓN INFORMATIVA */}
           <div style={{ 
             marginTop: '24px', 
             padding: '20px', 
