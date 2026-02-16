@@ -1,7 +1,8 @@
 // src/components/pacientes/FormDatosPersonales.tsx
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { FormField } from '../shared/FormField';
-import { FormData, Psicologo } from '../../types/types';
+import { FormData, Psicologo, Carrera } from '../../types/types';
+import { carreraService } from '../../services/carreraService';
 
 interface Props {
   formData: FormData;
@@ -13,6 +14,7 @@ interface Props {
   fetchingPsicologos: boolean;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   seleccionarPsicologo: (psicologo: Psicologo) => void;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
 }
 
 export const FormDatosPersonales: React.FC<Props> = ({
@@ -24,9 +26,52 @@ export const FormDatosPersonales: React.FC<Props> = ({
   setShowSugerencias,
   fetchingPsicologos,
   handleChange,
-  seleccionarPsicologo
+  seleccionarPsicologo,
+  setFormData
 }) => {
   const autocompleteRef = useRef<HTMLDivElement>(null);
+
+  // Estado para carreras
+  const [carreras, setCarreras] = useState<Carrera[]>([]);
+  const [loadingCarreras, setLoadingCarreras] = useState(false);
+  const [mostrarOtraCarrera, setMostrarOtraCarrera] = useState(false);
+  const [nuevaCarrera, setNuevaCarrera] = useState('');
+  const [departamento, setDepartamento] = useState(1);
+
+  // Cargar carreras al montar componente
+  useEffect(() => {
+    cargarCarreras();
+  }, []);
+
+  const cargarCarreras = async () => {
+    setLoadingCarreras(true);
+    try {
+      const data = await carreraService.obtenerTodas();
+      setCarreras(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error cargando carreras:', err);
+    } finally {
+      setLoadingCarreras(false);
+    }
+  };
+
+  const handleAgregarCarrera = async () => {
+    if (!nuevaCarrera.trim()) {
+      alert('Ingrese el nombre de la carrera');
+      return;
+    }
+
+    try {
+      const nuevaCarreraCreada = await carreraService.crear(nuevaCarrera, departamento);
+      setCarreras(prev => [...prev, nuevaCarreraCreada]);
+      setFormData(prev => ({ ...prev, carreraId: nuevaCarreraCreada.id }));
+      setMostrarOtraCarrera(false);
+      setNuevaCarrera('');
+    } catch (err) {
+      console.error('Error creando carrera:', err);
+      alert('Error al crear la carrera');
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -163,7 +208,36 @@ export const FormDatosPersonales: React.FC<Props> = ({
           <span className="section-number">03</span>
           <span className="section-text">Datos Académicos</span>
         </div>
+
+        {/* Dropdown de carreras */}
         <div className="grid-2-cols">
+          <FormField label="Carrera" required>
+            <select
+              name="carreraId"
+              value={formData.carreraId || ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === 'otra') {
+                  setMostrarOtraCarrera(true);
+                  setFormData(prev => ({ ...prev, carreraId: undefined }));
+                } else {
+                  setMostrarOtraCarrera(false);
+                  handleChange(e);
+                }
+              }}
+              className="input-academic"
+              disabled={loadingCarreras}
+            >
+              <option value="">Seleccione una carrera</option>
+              {carreras.map(carrera => (
+                <option key={carrera.id} value={carrera.id}>
+                  {carrera.carrera}
+                </option>
+              ))}
+              <option value="otra">➕ Otra carrera (agregar nueva)</option>
+            </select>
+          </FormField>
+
           <FormField label="Semestre Cursante" required>
             <input
               type="number"
@@ -175,6 +249,75 @@ export const FormDatosPersonales: React.FC<Props> = ({
               className="input-academic"
             />
           </FormField>
+        </div>
+
+        {/* Modal para agregar nueva carrera */}
+        {mostrarOtraCarrera && (
+          <div style={{
+            marginTop: '24px',
+            padding: '20px',
+            backgroundColor: '#fffbeb',
+            border: '2px solid #fbbf24',
+            borderRadius: '8px'
+          }}>
+            <h4 style={{ margin: '0 0 16px 0', color: '#92400e', fontWeight: '600' }}>
+              ➕ Agregar nueva carrera
+            </h4>
+
+            <div className="grid-2-cols">
+              <FormField label="Nombre de la carrera" required>
+                <input
+                  type="text"
+                  value={nuevaCarrera}
+                  onChange={(e) => setNuevaCarrera(e.target.value)}
+                  className="input-academic"
+                  placeholder="Ej. Ingeniería en Sistemas"
+                />
+              </FormField>
+
+              <FormField label="Departamento" required>
+                <select
+                  value={departamento}
+                  onChange={(e) => setDepartamento(parseInt(e.target.value))}
+                  className="input-academic"
+                >
+                  <option value={1}>Ciencias de la Tecnología e Innovación (DCT)</option>
+                  <option value={2}>Ciencias Industriales, Medio Ambiente y Energía (DCME)</option>
+                  <option value={3}>Ciencias de la Salud (DCS)</option>
+                  <option value={4}>Ciencias Empresariales (DCE)</option>
+                  <option value={5}>Ciencias Jurídicas y Sociales (DCJS)</option>
+                  <option value={6}>Arquitectura y Diseño Gráfico (DARQ)</option>
+                  <option value={7}>Ciencias Básicas e Infraestructura (DCI)</option>
+                </select>
+              </FormField>
+
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+              <button
+                type="button"
+                onClick={handleAgregarCarrera}
+                className="btn-submit"
+                style={{ flex: 1, backgroundColor: '#10b981' }}
+              >
+                ✓ Guardar carrera
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMostrarOtraCarrera(false);
+                  setNuevaCarrera('');
+                }}
+                className="btn-submit"
+                style={{ flex: 1, backgroundColor: '#64748b' }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div style={{ marginTop: '24px' }}>
           <FormField label="Remitido por">
             <input
               type="text"

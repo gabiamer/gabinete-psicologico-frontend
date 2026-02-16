@@ -3,6 +3,7 @@ import api from './api';
 import { FormData, AntecedentesData } from '../types/types';
 
 export const pacienteService = {
+  // Buscar en AMBOS tipos de pacientes (universitarios y externos)
   buscar: async (termino: string) => {
     try {
       // Buscar en pacientes universitarios
@@ -44,11 +45,36 @@ export const pacienteService = {
       semestre: formData.semestre,
       derivadoPor: formData.derivadoPor,
       psicologoId: formData.psicologoId,
-      carreraId: 1
+      carreraId: formData.carreraId
     };
 
     const response = await api.post('/pacientes/universitario', payload);
     return response.data.data?.id || response.data.id;
+  },
+
+  // Actualizar paciente universitario
+  actualizar: async (pacienteId: number, formData: FormData) => {
+    const payload = {
+      person: {
+        primerNombre: formData.primerNombre,
+        segundoNombre: formData.segundoNombre || null,
+        apellidoPaterno: formData.apellidoPaterno || null,
+        apellidoMaterno: formData.apellidoMaterno || null,
+        celular: formData.celular
+      },
+      fechaNacimiento: formData.fechaNacimiento,
+      edad: formData.edad || null,
+      genero: formData.genero,
+      domicilio: formData.domicilio,
+      estadoCivil: formData.estadoCivil,
+      semestre: formData.semestre,
+      derivadoPor: formData.derivadoPor,
+      psicologoId: formData.psicologoId,
+      carreraId: formData.carreraId
+    };
+
+    const response = await api.put(`/pacientes/universitario/${pacienteId}`, payload);
+    return response.data;
   },
 
   guardarHistoriaClinica: async (

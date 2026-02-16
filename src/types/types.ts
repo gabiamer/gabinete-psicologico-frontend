@@ -36,6 +36,7 @@ export interface FormData {
   semestre: number;
   derivadoPor: string;
   psicologoId: number | '';
+  carreraId?: number;
 }
 
 export interface AntecedentesData {
@@ -153,4 +154,10 @@ export interface OrientacionVocacionalData {
   tipoTrabajosDeseados: string;
   
   observacionesEntrevistador: string;
+}
+
+export interface Carrera {
+  id: number;
+  carrera: string;
+  departamento: number;
 }

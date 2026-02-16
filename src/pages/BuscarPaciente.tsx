@@ -130,7 +130,7 @@ const BuscarPaciente: React.FC = () => {
                           {paciente.paciente?.person?.primerNombre || ''} {paciente.paciente?.person?.segundoNombre || ''}{' '}
                           {paciente.paciente?.person?.apellidoPaterno || ''} {paciente.paciente?.person?.apellidoMaterno || ''}
                         </div>
-                        {/* 👈 BADGE para identificar tipo */}
+                        {/* BADGE para identificar tipo */}
                         <span style={{
                           padding: '4px 12px',
                           borderRadius: '12px',

@@ -74,17 +74,36 @@ export const FormUniversidad: React.FC<Props> = ({
             ))}
           </div>
 
+          {/* Usar radio buttons en lugar de input de texto */}
           <FormField label="¿Ha cambiado de carrera?">
-            <input
-              name="cambioCarreras"
-              value={antecedentes.cambioCarreras}
-              onChange={handleChange}
-              className="input-academic"
-              placeholder="Sí/No"
-            />
+            <div style={{ display: 'flex', gap: '24px', marginTop: '8px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="cambioCarreras"
+                  value="Si"
+                  checked={antecedentes.cambioCarreras === 'Si'}
+                  onChange={handleChange}
+                  style={{ cursor: 'pointer' }}
+                />
+                <span>Sí</span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input
+                  type="radio"
+                  name="cambioCarreras"
+                  value="No"
+                  checked={antecedentes.cambioCarreras === 'No'}
+                  onChange={handleChange}
+                  style={{ cursor: 'pointer' }}
+                />
+                <span>No</span>
+              </label>
+            </div>
           </FormField>
 
-          {antecedentes.cambioCarreras && (
+          {/*Condición corregida */}
+          {antecedentes.cambioCarreras === 'Si' && (
             <FormField label="Motivos del cambio">
               <textarea
                 name="motivosCambio"
@@ -92,6 +111,7 @@ export const FormUniversidad: React.FC<Props> = ({
                 onChange={handleChange}
                 className="textarea-academic"
                 rows={3}
+                placeholder="Describa los motivos del cambio de carrera..."
               />
             </FormField>
           )}

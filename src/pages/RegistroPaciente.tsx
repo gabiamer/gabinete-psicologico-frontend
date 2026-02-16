@@ -170,6 +170,8 @@ const RegistroPaciente: React.FC = () => {
     return true;
   };
 
+
+
   const handleSubmitStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensaje('');
@@ -182,9 +184,18 @@ const RegistroPaciente: React.FC = () => {
 
     setLoading(true);
     try {
-      const id = await pacienteService.crear(formData);
-      setPacienteId(id);
-      setMensaje('Ficha básica guardada');
+
+      if (pacienteId) {
+        // Actualizar paciente existente
+        await pacienteService.actualizar(pacienteId, formData);
+        setMensaje('Datos actualizados correctamente');
+      } else {
+        // Crear nuevo paciente
+        const id = await pacienteService.crear(formData);
+        setPacienteId(id);
+        setMensaje('Ficha básica guardada');
+      }
+
       setTimeout(() => {
         setPaso(2);
         setMensaje('');
@@ -290,6 +301,7 @@ const RegistroPaciente: React.FC = () => {
         {mensaje && <div className="alert alert-success">{mensaje}</div>}
         {error && <div className="alert alert-error">{error}</div>}
 
+
         {paso === 1 && (
           <form onSubmit={handleSubmitStep1} className="form-content" noValidate>
             <FormDatosPersonales
@@ -302,6 +314,7 @@ const RegistroPaciente: React.FC = () => {
               fetchingPsicologos={fetchingPsicologos}
               handleChange={handleChangeStep1}
               seleccionarPsicologo={seleccionarPsicologo}
+              setFormData={setFormData}
             />
             <div className="actions-footer">
               <button type="submit" disabled={loading} className="btn-submit">

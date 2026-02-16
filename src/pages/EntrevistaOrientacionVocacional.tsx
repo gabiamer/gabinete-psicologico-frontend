@@ -96,7 +96,7 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
 
     const cargarPaciente = async () => {
         try {
-            // 👈 CAMBIAR: usar pacienteExternoService en lugar de pacienteService
+            // usar pacienteExternoService en lugar de pacienteService
             const data = await pacienteExternoService.obtenerPorId(Number(id));
             setFormData({
                 primerNombre: data.paciente?.person?.primerNombre || '',
