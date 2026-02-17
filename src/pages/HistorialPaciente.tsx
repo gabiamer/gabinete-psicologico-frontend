@@ -1,6 +1,6 @@
 // src/pages/HistorialPaciente.tsx
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { pacienteService } from '../services/pacienteService';
 import { sesionService } from '../services/sesionService';
 import './RegistroPaciente.css';
@@ -8,6 +8,7 @@ import './RegistroPaciente.css';
 const HistorialPaciente: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
     const [paciente, setPaciente] = useState<any>(null);
     const [sesiones, setSesiones] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -15,7 +16,7 @@ const HistorialPaciente: React.FC = () => {
 
     useEffect(() => {
         cargarDatos();
-    }, [id]);
+    }, [id, location.key]); // Agregar location.key para recargar cuando cambie la ruta
 
     const cargarDatos = async () => {
         setLoading(true);
@@ -24,6 +25,9 @@ const HistorialPaciente: React.FC = () => {
                 pacienteService.obtenerPorId(Number(id)),
                 sesionService.obtenerPorPaciente(Number(id))
             ]);
+            
+            console.log('Sesiones cargadas:', sesionesData); // Debug
+            
             setPaciente(pacienteData);
             setSesiones(Array.isArray(sesionesData) ? sesionesData : []);
         } catch (err: any) {
@@ -126,40 +130,59 @@ const HistorialPaciente: React.FC = () => {
                         </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
-                            {sesiones.map((sesion, index) => (
-                                <div
-                                    key={sesion.id}
-                                    style={{
-                                        padding: '16px',
-                                        border: '2px solid #e2e8f0',
-                                        borderRadius: '8px',
-                                        backgroundColor: '#ffffff'
-                                    }}
-                                >
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                                        <div>
-                                            <div style={{ fontWeight: '600', fontSize: '16px', color: '#0f172a' }}>
-                                                Sesión #{sesiones.length - index}
-                                            </div>
-                                            <div style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
-                                                Fecha: {new Date(sesion.fecha).toLocaleDateString()} - Tipo: {sesion.tipo}
-                                            </div>
-                                            {sesion.acuerdos && (
-                                                <div style={{ fontSize: '14px', color: '#475569', marginTop: '8px', fontStyle: 'italic' }}>
-                                                    {sesion.acuerdos}
+                            {/* Ordenar sesiones de más reciente a más antigua */}
+                            {[...sesiones].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()).map((sesion, index) => {
+                                // Parsear acuerdos para obtener el número de sesión
+                                let numeroSesion = sesiones.length - index;
+                                if (sesion.acuerdos) {
+                                    try {
+                                        const acuerdosData = typeof sesion.acuerdos === 'string' 
+                                            ? JSON.parse(sesion.acuerdos) 
+                                            : sesion.acuerdos;
+                                        if (acuerdosData.numeroSesion) {
+                                            numeroSesion = acuerdosData.numeroSesion;
+                                        }
+                                    } catch (e) {
+                                        console.error('Error parseando acuerdos:', e);
+                                    }
+                                }
+
+                                return (
+                                    <div
+                                        key={sesion.id}
+                                        style={{
+                                            padding: '16px',
+                                            border: '2px solid #e2e8f0',
+                                            borderRadius: '8px',
+                                            backgroundColor: '#ffffff'
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                            <div>
+                                                <div style={{ fontWeight: '600', fontSize: '16px', color: '#0f172a' }}>
+                                                    Sesión #{numeroSesion}
                                                 </div>
-                                            )}
+                                                <div style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
+                                                    Fecha: {new Date(sesion.fecha).toLocaleDateString('es-ES', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })} - Tipo: {sesion.tipo}
+                                                </div>
+                                            </div>
+                                            <button
+                                                className="btn-submit"
+                                                style={{ minWidth: '100px', height: '36px' }}
+                                                onClick={() => navigate(`/sesiones/${sesion.id}`)}
+                                            >
+                                                Ver detalles
+                                            </button>
                                         </div>
-                                        <button
-                                            className="btn-submit"
-                                            style={{ minWidth: '100px', height: '36px' }}
-                                            onClick={() => navigate(`/sesiones/${sesion.id}`)}
-                                        >
-                                            Ver detalles
-                                        </button>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </section>

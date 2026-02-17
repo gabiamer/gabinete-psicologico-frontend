@@ -7,6 +7,8 @@ import RegistroPacienteExterno from './pages/RegistroPacienteExterno';
 import HistorialPaciente from './pages/HistorialPaciente';
 import NuevaSesion from './pages/NuevaSesion';
 import EntrevistaOrientacionVocacional from './pages/EntrevistaOrientacionVocacional'; 
+import DetalleOrientacionVocacional from './pages/DetalleOrientacionVocacional';
+import DetalleSesion from './pages/DetalleSesion';
 import './App.css';
 
 function App() {
@@ -21,6 +23,8 @@ function App() {
           <Route path="/pacientes/:id/historial" element={<HistorialPaciente />} />
           <Route path="/pacientes/:id/nueva-sesion" element={<NuevaSesion />} />
           <Route path="/pacientes-externos/:id/orientacion-vocacional" element={<EntrevistaOrientacionVocacional />} />
+          <Route path="/pacientes-externos/:id/detalle-orientacion" element={<DetalleOrientacionVocacional />} />
+          <Route path="/sesiones/:id" element={<DetalleSesion />} />
         </Routes>
       </div>
     </Router>

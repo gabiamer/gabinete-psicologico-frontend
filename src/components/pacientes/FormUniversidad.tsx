@@ -9,6 +9,7 @@ interface Props {
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
   setAntecedentes: React.Dispatch<React.SetStateAction<AntecedentesData>>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  readOnly?: boolean;
 }
 
 export const FormUniversidad: React.FC<Props> = ({
@@ -16,7 +17,8 @@ export const FormUniversidad: React.FC<Props> = ({
   antecedentes,
   setFormData,
   setAntecedentes,
-  handleChange
+  handleChange,
+  readOnly = false
 }) => {
   return (
     <>
@@ -31,14 +33,18 @@ export const FormUniversidad: React.FC<Props> = ({
             <input
               type="number"
               value={formData.semestre}
-              onChange={(e) => setFormData(prev => ({ ...prev, semestre: parseInt(e.target.value) || 1 }))}
+              onChange={(e) => !readOnly && setFormData(prev => ({ ...prev, semestre: parseInt(e.target.value) || 1 }))}
               className="input-academic"
               min="1"
               max="14"
+              readOnly={readOnly}
+              disabled={readOnly}
             />
-            <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
-              Se puede actualizar si es necesario
-            </p>
+            {!readOnly && (
+              <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                Se puede actualizar si es necesario
+              </p>
+            )}
           </FormField>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
@@ -50,59 +56,77 @@ export const FormUniversidad: React.FC<Props> = ({
             ].map(({ name, label }) => (
               <div key={name}>
                 <label className="field-label">{label}</label>
-                <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                  {[
-                    { valor: -2, label: '--' },
-                    { valor: -1, label: '-' },
-                    { valor: 1, label: '+' },
-                    { valor: 2, label: '++' }
-                  ].map(({ valor, label: lbl }) => (
-                    <label key={valor} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                      <input
-                        type="radio"
-                        name={name}
-                        value={valor}
-                        checked={antecedentes[name as keyof AntecedentesData] === valor}
-                        onChange={(e) => setAntecedentes(prev => ({ ...prev, [name]: parseInt(e.target.value) }))}
-                        style={{ cursor: 'pointer' }}
-                      />
-                      <span style={{ fontWeight: '600' }}>{lbl}</span>
-                    </label>
-                  ))}
-                </div>
+                {readOnly ? (
+                  <input
+                    type="text"
+                    value={antecedentes[name as keyof AntecedentesData]}
+                    className="input-academic"
+                    readOnly
+                    disabled
+                  />
+                ) : (
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                    {[
+                      { valor: -2, label: '--' },
+                      { valor: -1, label: '-' },
+                      { valor: 1, label: '+' },
+                      { valor: 2, label: '++' }
+                    ].map(({ valor, label: lbl }) => (
+                      <label key={valor} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          name={name}
+                          value={valor}
+                          checked={antecedentes[name as keyof AntecedentesData] === valor}
+                          onChange={(e) => setAntecedentes(prev => ({ ...prev, [name]: parseInt(e.target.value) }))}
+                          style={{ cursor: 'pointer' }}
+                        />
+                        <span style={{ fontWeight: '600' }}>{lbl}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
 
-          {/* Usar radio buttons en lugar de input de texto */}
           <FormField label="¿Ha cambiado de carrera?">
-            <div style={{ display: 'flex', gap: '24px', marginTop: '8px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                <input
-                  type="radio"
-                  name="cambioCarreras"
-                  value="Si"
-                  checked={antecedentes.cambioCarreras === 'Si'}
-                  onChange={handleChange}
-                  style={{ cursor: 'pointer' }}
-                />
-                <span>Sí</span>
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                <input
-                  type="radio"
-                  name="cambioCarreras"
-                  value="No"
-                  checked={antecedentes.cambioCarreras === 'No'}
-                  onChange={handleChange}
-                  style={{ cursor: 'pointer' }}
-                />
-                <span>No</span>
-              </label>
-            </div>
+            {readOnly ? (
+              <input
+                type="text"
+                value={antecedentes.cambioCarreras}
+                className="input-academic"
+                readOnly
+                disabled
+              />
+            ) : (
+              <div style={{ display: 'flex', gap: '24px', marginTop: '8px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="cambioCarreras"
+                    value="Si"
+                    checked={antecedentes.cambioCarreras === 'Si'}
+                    onChange={handleChange}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  <span>Sí</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="cambioCarreras"
+                    value="No"
+                    checked={antecedentes.cambioCarreras === 'No'}
+                    onChange={handleChange}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  <span>No</span>
+                </label>
+              </div>
+            )}
           </FormField>
 
-          {/*Condición corregida */}
           {antecedentes.cambioCarreras === 'Si' && (
             <FormField label="Motivos del cambio">
               <textarea
@@ -112,6 +136,8 @@ export const FormUniversidad: React.FC<Props> = ({
                 className="textarea-academic"
                 rows={3}
                 placeholder="Describa los motivos del cambio de carrera..."
+                readOnly={readOnly}
+                disabled={readOnly}
               />
             </FormField>
           )}
@@ -124,6 +150,8 @@ export const FormUniversidad: React.FC<Props> = ({
               className="textarea-academic"
               rows={5}
               placeholder="Describa su experiencia..."
+              readOnly={readOnly}
+              disabled={readOnly}
             />
           </FormField>
         </div>
@@ -136,16 +164,18 @@ export const FormUniversidad: React.FC<Props> = ({
           <span className="section-text">Hábitos y Otros Aspectos</span>
         </div>
 
-        <div style={{ marginBottom: '32px', padding: '20px', backgroundColor: '#f1f5f9', borderRadius: '8px' }}>
-          <p style={{ margin: 0, color: '#475569', fontWeight: '600' }}>
-            Indique la frecuencia de consumo para cada sustancia:
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px', marginTop: '12px', fontSize: '13px' }}>
-            {['0: Nunca', '1: Muy poco', '2: Poco', '3: Ocasional', '4: Frecuente', '5: Muy frecuente'].map(txt => (
-              <div key={txt} style={{ textAlign: 'center', fontWeight: '600', color: '#0f172a' }}>{txt}</div>
-            ))}
+        {!readOnly && (
+          <div style={{ marginBottom: '32px', padding: '20px', backgroundColor: '#f1f5f9', borderRadius: '8px' }}>
+            <p style={{ margin: 0, color: '#475569', fontWeight: '600' }}>
+              Indique la frecuencia de consumo para cada sustancia:
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px', marginTop: '12px', fontSize: '13px' }}>
+              {['0: Nunca', '1: Muy poco', '2: Poco', '3: Ocasional', '4: Frecuente', '5: Muy frecuente'].map(txt => (
+                <div key={txt} style={{ textAlign: 'center', fontWeight: '600', color: '#0f172a' }}>{txt}</div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           {['Alcohol', 'Tabaco', 'Drogas'].map((sustancia) => {
@@ -159,25 +189,37 @@ export const FormUniversidad: React.FC<Props> = ({
                     onChange={handleChange}
                     className="input-academic"
                     placeholder="Describa el tipo y detalles"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                 </FormField>
                 <div style={{ marginTop: '12px' }}>
                   <label className="field-label">Frecuencia de consumo de {key}</label>
-                  <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                    {[0, 1, 2, 3, 4, 5].map(valor => (
-                      <label key={valor} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                        <input
-                          type="radio"
-                          name={`frecuencia${sustancia}`}
-                          value={valor}
-                          checked={antecedentes[`frecuencia${sustancia}` as keyof AntecedentesData] === valor}
-                          onChange={(e) => setAntecedentes(prev => ({ ...prev, [`frecuencia${sustancia}`]: parseInt(e.target.value) }))}
-                          style={{ cursor: 'pointer' }}
-                        />
-                        <span style={{ fontWeight: '600' }}>{valor}</span>
-                      </label>
-                    ))}
-                  </div>
+                  {readOnly ? (
+                    <input
+                      type="text"
+                      value={antecedentes[`frecuencia${sustancia}` as keyof AntecedentesData]}
+                      className="input-academic"
+                      readOnly
+                      disabled
+                    />
+                  ) : (
+                    <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                      {[0, 1, 2, 3, 4, 5].map(valor => (
+                        <label key={valor} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                          <input
+                            type="radio"
+                            name={`frecuencia${sustancia}`}
+                            value={valor}
+                            checked={antecedentes[`frecuencia${sustancia}` as keyof AntecedentesData] === valor}
+                            onChange={(e) => setAntecedentes(prev => ({ ...prev, [`frecuencia${sustancia}`]: parseInt(e.target.value) }))}
+                            style={{ cursor: 'pointer' }}
+                          />
+                          <span style={{ fontWeight: '600' }}>{valor}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -191,6 +233,8 @@ export const FormUniversidad: React.FC<Props> = ({
               className="textarea-academic"
               rows={4}
               placeholder="Describa cualquier situación legal..."
+              readOnly={readOnly}
+              disabled={readOnly}
             />
           </FormField>
         </div>

@@ -5,10 +5,11 @@ import { AntecedentesData } from '../../types/types';
 
 interface Props {
   antecedentes: AntecedentesData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  readOnly?: boolean;
 }
 
-export const FormAntecedentes: React.FC<Props> = ({ antecedentes, handleChange }) => {
+export const FormAntecedentes: React.FC<Props> = ({ antecedentes, handleChange, readOnly = false }) => {
   return (
     <>
       <section className="form-section">
@@ -17,22 +18,26 @@ export const FormAntecedentes: React.FC<Props> = ({ antecedentes, handleChange }
           <span className="section-text">Situación Actual y Motivo</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          <FormField label="¿Cuándo se sintió bien por última vez?" required>
+          <FormField label="¿Cuándo se sintió bien por última vez?" required={!readOnly}>
             <textarea
               name="ultimaVezBien"
               value={antecedentes.ultimaVezBien}
               onChange={handleChange}
               className="textarea-academic"
               placeholder="Describa..."
+              readOnly={readOnly}
+              disabled={readOnly}
             />
           </FormField>
-          <FormField label="Desarrollo de los síntomas" required>
+          <FormField label="Desarrollo de los síntomas" required={!readOnly}>
             <textarea
               name="desarrolloSintomas"
               value={antecedentes.desarrolloSintomas}
               onChange={handleChange}
               className="textarea-academic"
               placeholder="Describa..."
+              readOnly={readOnly}
+              disabled={readOnly}
             />
           </FormField>
           <FormField label="Antecedentes Familiares">
@@ -42,6 +47,8 @@ export const FormAntecedentes: React.FC<Props> = ({ antecedentes, handleChange }
               onChange={handleChange}
               className="textarea-academic"
               placeholder="Describa..."
+              readOnly={readOnly}
+              disabled={readOnly}
             />
           </FormField>
         </div>
@@ -54,16 +61,44 @@ export const FormAntecedentes: React.FC<Props> = ({ antecedentes, handleChange }
         </div>
         <div className="grid-fields">
           <FormField label="Sueño">
-            <input name="sueno" value={antecedentes.sueno} onChange={handleChange} className="input-academic" />
+            <input 
+              name="sueno" 
+              value={antecedentes.sueno} 
+              onChange={handleChange} 
+              className="input-academic"
+              readOnly={readOnly}
+              disabled={readOnly}
+            />
           </FormField>
           <FormField label="Apetito">
-            <input name="apetito" value={antecedentes.apetito} onChange={handleChange} className="input-academic" />
+            <input 
+              name="apetito" 
+              value={antecedentes.apetito} 
+              onChange={handleChange} 
+              className="input-academic"
+              readOnly={readOnly}
+              disabled={readOnly}
+            />
           </FormField>
           <FormField label="Sed">
-            <input name="sed" value={antecedentes.sed} onChange={handleChange} className="input-academic" />
+            <input 
+              name="sed" 
+              value={antecedentes.sed} 
+              onChange={handleChange} 
+              className="input-academic"
+              readOnly={readOnly}
+              disabled={readOnly}
+            />
           </FormField>
           <FormField label="Defecación">
-            <input name="defecacion" value={antecedentes.defecacion} onChange={handleChange} className="input-academic" />
+            <input 
+              name="defecacion" 
+              value={antecedentes.defecacion} 
+              onChange={handleChange} 
+              className="input-academic"
+              readOnly={readOnly}
+              disabled={readOnly}
+            />
           </FormField>
         </div>
       </section>

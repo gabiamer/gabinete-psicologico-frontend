@@ -94,10 +94,15 @@ export interface AntecedentesData {
   
   relatoAcusacionDetencion: string;
 
+  // Sesión inicial - campos adicionales (parte 7)
+  gravedad?: 'leve' | 'moderado' | 'grave';
+  tipologias?: string[];
+  notasSesion?: string;
+  objetivosSesion?: string;
   acuerdosEstablecidos: string;
   proximaSesionFecha: string;
   proximaSesionHora: string;
-  
+
 }
 
 

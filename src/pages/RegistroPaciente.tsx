@@ -9,6 +9,7 @@ import { FormAntecedentes } from '../components/pacientes/FormAntecedentes';
 import { FormHistoriaFamiliar } from '../components/pacientes/FormHistoriaFamiliar';
 import { FormSintomatologia } from '../components/pacientes/FormSintomatologia';
 import { FormUniversidad } from '../components/pacientes/FormUniversidad';
+import { FormEvaluacion } from '../components/pacientes/FormEvaluacion';
 import { FormAcuerdos } from '../components/pacientes/FormAcuerdos';
 import './RegistroPaciente.css';
 
@@ -18,12 +19,13 @@ const PASOS = [
   { numero: 3, label: 'Historia Familiar' },
   { numero: 4, label: 'Sintomatologías' },
   { numero: 5, label: 'Universidad y Hábitos' },
-  { numero: 6, label: 'Acuerdos y Cierre' }
+  { numero: 6, label: 'Evaluación y Tipología' },
+  { numero: 7, label: 'Acuerdos y Cierre' }
 ];
 
 const RegistroPaciente: React.FC = () => {
   const navigate = useNavigate();
-  const [paso, setPaso] = useState<1 | 2 | 3 | 4 | 5 | 6>(1);
+  const [paso, setPaso] = useState<1 | 2 | 3 | 4 | 5 | 6 | 7>(1);
   const [pacienteId, setPacienteId] = useState<number | null>(null);
 
   const [formData, setFormData] = useState<FormData>({
@@ -77,6 +79,10 @@ const RegistroPaciente: React.FC = () => {
     consumoDrogas: '',
     frecuenciaDrogas: 0,
     relatoAcusacionDetencion: '',
+    gravedad: 'leve',
+    tipologias: [],
+    notasSesion: '',
+    objetivosSesion: '',
     acuerdosEstablecidos: '',
     proximaSesionFecha: '',
     proximaSesionHora: ''
@@ -170,8 +176,6 @@ const RegistroPaciente: React.FC = () => {
     return true;
   };
 
-
-
   const handleSubmitStep1 = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensaje('');
@@ -184,13 +188,10 @@ const RegistroPaciente: React.FC = () => {
 
     setLoading(true);
     try {
-
       if (pacienteId) {
-        // Actualizar paciente existente
         await pacienteService.actualizar(pacienteId, formData);
         setMensaje('Datos actualizados correctamente');
       } else {
-        // Crear nuevo paciente
         const id = await pacienteService.crear(formData);
         setPacienteId(id);
         setMensaje('Ficha básica guardada');
@@ -236,7 +237,13 @@ const RegistroPaciente: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSubmitStep6 = async (e: React.FormEvent) => {
+  const handleSubmitStep6 = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPaso(7);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSubmitStep7 = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting) return;
     setSubmitting(true);
@@ -263,6 +270,7 @@ const RegistroPaciente: React.FC = () => {
       'Historia Familiar',
       'Evaluación de Sintomatologías',
       'Socialización y Hábitos',
+      'Evaluación y Tipología',
       'Acuerdos y Próxima Sesión'
     ];
     return titulos[paso - 1];
@@ -275,6 +283,7 @@ const RegistroPaciente: React.FC = () => {
       'Datos de la Familia',
       'Evaluación de Estrés, Ansiedad y Depresión',
       'Vida Universitaria y Aspectos de Salud',
+      'Gravedad y Clasificación del Caso',
       'Compromisos y Seguimiento'
     ];
     return subtitulos[paso - 1];
@@ -301,7 +310,6 @@ const RegistroPaciente: React.FC = () => {
         {mensaje && <div className="alert alert-success">{mensaje}</div>}
         {error && <div className="alert alert-error">{error}</div>}
 
-
         {paso === 1 && (
           <form onSubmit={handleSubmitStep1} className="form-content" noValidate>
             <FormDatosPersonales
@@ -317,6 +325,14 @@ const RegistroPaciente: React.FC = () => {
               setFormData={setFormData}
             />
             <div className="actions-footer">
+              <button 
+                type="button" 
+                onClick={() => navigate('/buscar-paciente')} 
+                className="btn-submit" 
+                style={{ backgroundColor: '#64748b' }}
+              >
+                Cancelar
+              </button>
               <button type="submit" disabled={loading} className="btn-submit">
                 {loading ? 'Guardando...' : 'Guardar y Continuar'}
               </button>
@@ -380,6 +396,21 @@ const RegistroPaciente: React.FC = () => {
 
         {paso === 6 && (
           <form onSubmit={handleSubmitStep6} className="form-content" noValidate>
+            <FormEvaluacion 
+              antecedentes={antecedentes}
+              setAntecedentes={setAntecedentes}
+            />
+            <div className="actions-footer">
+              <button type="button" onClick={() => setPaso(5)} className="btn-submit" style={{ backgroundColor: '#64748b' }}>
+                Volver
+              </button>
+              <button type="submit" className="btn-submit">Continuar</button>
+            </div>
+          </form>
+        )}
+
+        {paso === 7 && (
+          <form onSubmit={handleSubmitStep7} className="form-content" noValidate>
             <FormAcuerdos
               formData={formData}
               antecedentes={antecedentes}
@@ -387,7 +418,7 @@ const RegistroPaciente: React.FC = () => {
               handleChange={handleChangeStep2}
             />
             <div className="actions-footer">
-              <button type="button" onClick={() => setPaso(5)} className="btn-submit" style={{ backgroundColor: '#64748b' }}>
+              <button type="button" onClick={() => setPaso(6)} className="btn-submit" style={{ backgroundColor: '#64748b' }}>
                 Volver
               </button>
               <button type="submit" disabled={loading || submitting} className="btn-submit">

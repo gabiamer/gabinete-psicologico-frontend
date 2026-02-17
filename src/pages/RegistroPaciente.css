@@ -1,7 +1,6 @@
-
 /* Contenedor Principal */
 .registro-wrapper {
-  max-width: 1000px;
+  max-width: 1200px; /* Aumentado de 1000px a 1200px */
   margin: 40px auto;
   padding: 0 20px;
   animation: fadeIn 0.6s ease-out;
@@ -37,14 +36,17 @@
 }
 
 .step-circle {
-  width: 32px;
-  height: 32px;
+  width: 36px; /* Aumentado de 32px a 36px */
+  height: 36px;
   border-radius: 50%;
   border: 2px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0; /* Evita que se comprima */
 }
 
 .step-indicator.active .step-circle {
@@ -114,6 +116,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
+  flex-shrink: 0; /* Evita que se comprima */
 }
 
 .section-text {
@@ -149,7 +152,7 @@
   font-weight: 700;
   color: #475569;
   text-transform: uppercase;
-  text-align: center;
+  margin-bottom: 6px;
 }
 
 .input-academic, .textarea-academic {
@@ -177,6 +180,12 @@
   box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
+.input-academic:disabled, .textarea-academic:disabled {
+  background-color: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
 /* Botones */
 .actions-footer {
   display: flex;
@@ -188,20 +197,28 @@
 .btn-submit {
   background-color: #0f172a;
   color: white;
-  padding: 18px 60px;
+  padding: 18px 40px; /* Ajustado padding horizontal */
   border-radius: 18px;
-  font-size: 1.1rem;
+  font-size: 1rem; /* Reducido ligeramente */
   font-weight: 800;
   text-transform: uppercase;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap; /* Evita que el texto se rompa en múltiples líneas */
+  min-width: 150px; /* Ancho mínimo para botones */
 }
 
 .btn-submit:hover:not(:disabled) {
   background-color: #4f46e5;
   transform: translateY(-3px);
   box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.3);
+}
+
+.btn-submit:disabled {
+  background-color: #cbd5e1;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Alertas */
@@ -225,7 +242,87 @@
   border: 1px solid #ef4444;
 }
 
-.autocomplete-container { position: relative; max-width: 600px; margin: 0 auto; }
-.suggestions-list { position: absolute; z-index: 50; width: 100%; margin-top: 10px; background: white; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2); max-height: 250px; overflow-y: auto; }
-.suggestion-item { padding: 14px 20px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
-.suggestion-item:hover { background-color: #f5f3ff; }
+/* Autocomplete */
+.autocomplete-container { 
+  position: relative; 
+  max-width: 600px; 
+  margin: 0 auto; 
+}
+
+.suggestions-list { 
+  position: absolute; 
+  z-index: 50; 
+  width: 100%; 
+  margin-top: 10px; 
+  background: white; 
+  border: 1px solid #e2e8f0; 
+  border-radius: 16px; 
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2); 
+  max-height: 250px; 
+  overflow-y: auto; 
+}
+
+.suggestion-item { 
+  padding: 14px 20px; 
+  cursor: pointer; 
+  border-bottom: 1px solid #f1f5f9; 
+}
+
+.suggestion-item:hover { 
+  background-color: #f5f3ff; 
+}
+
+/* Estilos para listas de resultados (búsqueda de pacientes, historial, etc) */
+.resultado-item {
+  padding: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  margin-bottom: 12px;
+}
+
+.resultado-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.resultado-info {
+  flex: 1;
+  min-width: 0; /* Permite que el texto se trunque correctamente */
+}
+
+.resultado-acciones {
+  flex-shrink: 0; /* Evita que los botones se compriman */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .registro-wrapper {
+    max-width: 100%;
+    padding: 0 16px;
+  }
+
+  .form-content {
+    padding: 30px 20px;
+  }
+
+  .grid-2-cols {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .stepper-container {
+    gap: 20px;
+  }
+
+  .step-indicator span {
+    display: none; /* Oculta el texto en móvil, solo muestra círculos */
+  }
+
+  .btn-submit {
+    padding: 14px 30px;
+    font-size: 0.9rem;
+  }
+}

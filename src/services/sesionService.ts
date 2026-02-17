@@ -15,5 +15,10 @@ export const sesionService = {
   actualizar: async (sesionId: number, sesionData: any) => {
     const response = await api.put(`/sesiones/${sesionId}`, sesionData);
     return response.data.data || response.data;
+  },
+
+  obtenerPorId: async (sesionId: number) => {
+    const response = await api.get(`/sesiones/${sesionId}`);
+    return response.data.data || response.data;
   }
 };

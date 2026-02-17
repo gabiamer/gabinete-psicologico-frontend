@@ -3,22 +3,38 @@ import api from './api';
 import { FormData, AntecedentesData } from '../types/types';
 
 export const pacienteService = {
-  // Buscar en AMBOS tipos de pacientes (universitarios y externos)
-  buscar: async (termino: string) => {
+  // Buscar en AMBOS tipos de pacientes (universitarios y externos) con filtro opcional de fecha
+  buscar: async (termino: string, fecha?: string) => {
     try {
+      // Construir parámetros de búsqueda
+      const params = new URLSearchParams();
+      if (termino && termino.trim()) {
+        params.append('q', termino.trim());
+      }
+      if (fecha && fecha.trim()) {
+        params.append('fecha', fecha.trim());
+      }
+      const queryString = params.toString();
+
       // Buscar en pacientes universitarios
-      const responseUniversitarios = await api.get(`/pacientes/buscar?q=${termino}`);
+      const urlUniversitarios = queryString 
+        ? `/pacientes/buscar?${queryString}` 
+        : '/pacientes/buscar';
+      const responseUniversitarios = await api.get(urlUniversitarios);
       const universitarios = (responseUniversitarios.data.data || responseUniversitarios.data || []).map((p: any) => ({
         ...p,
         tipo: 'universitario'
       }));
 
-      // Buscar en pacientes externos
-      const responseExternos = await api.get(`/pacientes-externos/buscar?q=${termino}`);
-      const externos = (responseExternos.data.data || responseExternos.data || []).map((p: any) => ({
-        ...p,
-        tipo: 'externo'
-      }));
+      // Buscar en pacientes externos (solo si hay término, no fecha - externos no tienen sesiones con fecha)
+      let externos: any[] = [];
+      if (termino && termino.trim()) {
+        const responseExternos = await api.get(`/pacientes-externos/buscar?q=${termino}`);
+        externos = (responseExternos.data.data || responseExternos.data || []).map((p: any) => ({
+          ...p,
+          tipo: 'externo'
+        }));
+      }
 
       // Combinar ambos resultados
       return [...universitarios, ...externos];

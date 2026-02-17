@@ -7,14 +7,16 @@ import './RegistroPaciente.css';
 const BuscarPaciente: React.FC = () => {
   const navigate = useNavigate();
   const [terminoBusqueda, setTerminoBusqueda] = useState('');
+  const [fechaBusqueda, setFechaBusqueda] = useState('');
   const [resultados, setResultados] = useState<any[]>([]);
   const [buscando, setBuscando] = useState(false);
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
 
   const buscarPaciente = async () => {
-    if (!terminoBusqueda.trim()) {
-      setError('Ingrese un nombre, celular o carnet de identidad');
+    // Validar que al menos uno de los campos esté lleno
+    if (!terminoBusqueda.trim() && !fechaBusqueda) {
+      setError('Ingrese un nombre, celular o seleccione una fecha');
       return;
     }
 
@@ -23,11 +25,11 @@ const BuscarPaciente: React.FC = () => {
     setMensaje('');
 
     try {
-      const pacientes = await pacienteService.buscar(terminoBusqueda);
+      const pacientes = await pacienteService.buscar(terminoBusqueda, fechaBusqueda);
       setResultados(pacientes);
 
       if (pacientes.length === 0) {
-        setMensaje('No se encontró ningún paciente. Puede proceder con el registro nuevo.');
+        setMensaje('No se encontró ningún paciente con los criterios especificados.');
       }
     } catch (err: any) {
       console.error('Error en búsqueda:', err);
@@ -35,6 +37,14 @@ const BuscarPaciente: React.FC = () => {
     } finally {
       setBuscando(false);
     }
+  };
+
+  const limpiarBusqueda = () => {
+    setTerminoBusqueda('');
+    setFechaBusqueda('');
+    setResultados([]);
+    setMensaje('');
+    setError('');
   };
 
   const iniciarRegistroNuevo = () => {
@@ -49,7 +59,7 @@ const BuscarPaciente: React.FC = () => {
     if (paciente.tipo === 'universitario') {
       navigate(`/pacientes/${paciente.id}/historial`);
     } else {
-      navigate(`/pacientes-externos/${paciente.id}/orientacion-vocacional`);
+      navigate(`/pacientes-externos/${paciente.id}/detalle-orientacion`);
     }
   };
 
@@ -77,28 +87,61 @@ const BuscarPaciente: React.FC = () => {
               <span className="section-text">Buscar Paciente Existente</span>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
-              <div style={{ flex: 1 }}>
-                <label className="field-label">Nombre, Celular o Correo</label>
-                <input
-                  type="text"
-                  value={terminoBusqueda}
-                  onChange={(e) => setTerminoBusqueda(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="input-academic"
-                  placeholder="Ej. Juan Pérez, 70123456, correo@ejemplo.com"
-                  autoFocus
-                />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Búsqueda por término */}
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="field-label">Nombre, Celular o Correo</label>
+                  <input
+                    type="text"
+                    value={terminoBusqueda}
+                    onChange={(e) => setTerminoBusqueda(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="input-academic"
+                    placeholder="Ej. Juan Pérez, 70123456, correo@ejemplo.com"
+                    autoFocus
+                  />
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={buscarPaciente}
-                disabled={buscando}
-                className="btn-submit"
-                style={{ height: '48px', minWidth: '120px' }}
-              >
-                {buscando ? 'Buscando...' : 'Buscar'}
-              </button>
+
+              {/* Búsqueda por fecha */}
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+                <div style={{ flex: 1 }}>
+                  <label className="field-label">Filtrar por fecha de sesión</label>
+                  <input
+                    type="date"
+                    value={fechaBusqueda}
+                    onChange={(e) => setFechaBusqueda(e.target.value)}
+                    className="input-academic"
+                  />
+                  <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+                    Busca pacientes que tuvieron sesiones en esta fecha
+                  </p>
+                </div>
+              </div>
+
+              {/* Botones de acción */}
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                {(terminoBusqueda || fechaBusqueda) && (
+                  <button
+                    type="button"
+                    onClick={limpiarBusqueda}
+                    className="btn-submit"
+                    style={{ backgroundColor: '#94a3b8', minWidth: '120px' }}
+                  >
+                    Limpiar
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={buscarPaciente}
+                  disabled={buscando}
+                  className="btn-submit"
+                  style={{ minWidth: '120px' }}
+                >
+                  {buscando ? 'Buscando...' : 'Buscar'}
+                </button>
+              </div>
             </div>
           </section>
 

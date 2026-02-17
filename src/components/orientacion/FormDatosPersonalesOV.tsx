@@ -98,10 +98,11 @@ export const FormDatosPersonalesOV: React.FC<Props> = ({
                     <FormField label="Escuela">
                         <input
                             type="text"
+                            name="derivadoPor"
+                            value={formData.derivadoPor}
+                            onChange={handleChangeFormData}
                             className="input-academic"
-                            defaultValue="Universidad Autónoma Juan Misael Saracho"
-                            readOnly
-                            style={{ backgroundColor: '#f1f5f9' }}
+                            placeholder="Nombre de la escuela o colegio"
                         />
                     </FormField>
 
