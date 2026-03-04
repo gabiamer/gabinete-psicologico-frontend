@@ -39,70 +39,56 @@ export interface FormData {
   carreraId?: number;
 }
 
+// src/types/types.ts
+
 export interface AntecedentesData {
-  // Situación actual
-  ultimaVezBien: string;
-  desarrolloSintomas: string;
-  antecedentesFamiliares: string;
-
-  // Funciones orgánicas
-  sueno: string;
-  apetito: string;
-  sed: string;
-  defecacion: string;
-
+  // NUEVO: Campo único para motivo y antecedentes
+  motivoConsulta?: string;
   
+  historiaClinica?: string;
   // Historia familiar
   conQuienVive: string;
   personaReferencia: string;
   celularReferencia: string;
-  
+
   // Padre
   nombrePadre: string;
   ocupacionPadre: string;
   enfermedadPadre: string;
   relacionPadre: string;
-  
+
   // Madre
   nombreMadre: string;
   ocupacionMadre: string;
   enfermedadMadre: string;
   relacionMadre: string;
-  
+
   // Hermanos
-  numeroHermanos: number | '';
+  numeroHermanos: string;
   relatoHermanos: string;
 
   // Universidad
-  nivelSatisfaccion: number;
-  rendimiento: number;
-  estresUniversitario: number;
-  interaccionSocial: number;
   cambioCarreras: string;
   motivosCambio: string;
   relatoUniversidad: string;
-  
+
   // Hábitos
   consumoAlcohol: string;
-  frecuenciaAlcohol: number;  // 1-5
-  
+  frecuenciaAlcohol: number;
   consumoTabaco: string;
-  frecuenciaTabaco: number;   // 1-5
-  
+  frecuenciaTabaco: number;
   consumoDrogas: string;
-  frecuenciaDrogas: number;   // 1-5
-  
+  frecuenciaDrogas: number;
   relatoAcusacionDetencion: string;
 
-  // Sesión inicial - campos adicionales (parte 7)
+  // Evaluación (paso 7)
   gravedad?: 'leve' | 'moderado' | 'grave';
   tipologias?: string[];
-  notasSesion?: string;
-  objetivosSesion?: string;
+
+  // Acuerdos (paso 6) 
   acuerdosEstablecidos: string;
   proximaSesionFecha: string;
   proximaSesionHora: string;
-
 }
 
 
@@ -126,17 +112,17 @@ export interface OrientacionVocacionalData {
   motivoCambioPrimaria: string;
   mismaSecundaria: string; // "Si" o "No"
   motivoCambioSecundaria: string;
-  
+
   materiaInteresante1: string;
   materiaInteresante2: string;
   materiaInteresante3: string;
   motivoMateriasInteresantes: string;
-  
+
   materiaDesinteresante1: string;
   materiaDesinteresante2: string;
   materiaDesinteresante3: string;
   motivoMateriasDesinteresantes: string;
-  
+
   satisfaccionesEscuela: string;
   relacionCompaneros: string;
   relacionProfesores: string;
@@ -144,20 +130,20 @@ export interface OrientacionVocacionalData {
   // Objetivos profesionales
   planDespuesPreparatoria: string; // "estudiar", "trabajar", "estudiar_trabajar", "ninguno"
   motivoPlanFuturo: string;
-  
+
   carreraInteres1: string;
   carreraInteres2: string;
   carreraInteres3: string;
-  
+
   carreraNoInteres1: string;
   carreraNoInteres2: string;
   carreraNoInteres3: string;
-  
+
   factorEconomico: string;
   apoyoFamiliar: string;
   visionCincoAnos: string;
   tipoTrabajosDeseados: string;
-  
+
   observacionesEntrevistador: string;
 }
 

@@ -47,48 +47,7 @@ export const FormUniversidad: React.FC<Props> = ({
             )}
           </FormField>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px' }}>
-            {[
-              { name: 'nivelSatisfaccion', label: 'Nivel de satisfacción' },
-              { name: 'rendimiento', label: 'Rendimiento' },
-              { name: 'estresUniversitario', label: 'Estrés' },
-              { name: 'interaccionSocial', label: 'Interacción social' }
-            ].map(({ name, label }) => (
-              <div key={name}>
-                <label className="field-label">{label}</label>
-                {readOnly ? (
-                  <input
-                    type="text"
-                    value={antecedentes[name as keyof AntecedentesData]}
-                    className="input-academic"
-                    readOnly
-                    disabled
-                  />
-                ) : (
-                  <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                    {[
-                      { valor: -2, label: '--' },
-                      { valor: -1, label: '-' },
-                      { valor: 1, label: '+' },
-                      { valor: 2, label: '++' }
-                    ].map(({ valor, label: lbl }) => (
-                      <label key={valor} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                        <input
-                          type="radio"
-                          name={name}
-                          value={valor}
-                          checked={antecedentes[name as keyof AntecedentesData] === valor}
-                          onChange={(e) => setAntecedentes(prev => ({ ...prev, [name]: parseInt(e.target.value) }))}
-                          style={{ cursor: 'pointer' }}
-                        />
-                        <span style={{ fontWeight: '600' }}>{lbl}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          {/* SECCIÓN ELIMINADA - Los radio buttons de satisfacción, rendimiento, estrés, interacción */}
 
           <FormField label="¿Ha cambiado de carrera?">
             {readOnly ? (

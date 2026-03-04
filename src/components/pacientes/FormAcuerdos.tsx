@@ -25,42 +25,11 @@ export const FormAcuerdos: React.FC<Props> = ({
 }) => {
   return (
     <>
+      {/* SECCIÓN 16 ELIMINADA COMPLETAMENTE */}
+
       <section className="form-section">
         <div className="section-title">
           <span className="section-number">16</span>
-          <span className="section-text">Observaciones de la Sesión Inicial</span>
-        </div>
-
-        <FormField label="Impresión general y observaciones de la primera sesión">
-          <textarea
-            name="notasSesion"
-            value={antecedentes.notasSesion || ''}
-            onChange={handleChange}
-            className="textarea-academic"
-            rows={6}
-            placeholder="Describa su impresión general del paciente, aspectos relevantes observados durante la entrevista inicial..."
-            readOnly={readOnly}
-            disabled={readOnly}
-          />
-        </FormField>
-
-        <FormField label="Objetivos terapéuticos iniciales">
-          <textarea
-            name="objetivosSesion"
-            value={antecedentes.objetivosSesion || ''}
-            onChange={handleChange}
-            className="textarea-academic"
-            rows={4}
-            placeholder="¿Cuáles son los objetivos iniciales del tratamiento?"
-            readOnly={readOnly}
-            disabled={readOnly}
-          />
-        </FormField>
-      </section>
-
-      <section className="form-section">
-        <div className="section-title">
-          <span className="section-number">17</span>
           <span className="section-text">Acuerdos y Compromisos</span>
         </div>
 
@@ -80,7 +49,7 @@ export const FormAcuerdos: React.FC<Props> = ({
 
       <section className="form-section">
         <div className="section-title">
-          <span className="section-number">18</span>
+          <span className="section-number">17</span>
           <span className="section-text">Próxima Sesión</span>
         </div>
 

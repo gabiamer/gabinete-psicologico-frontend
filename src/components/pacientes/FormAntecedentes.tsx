@@ -15,92 +15,51 @@ export const FormAntecedentes: React.FC<Props> = ({ antecedentes, handleChange, 
       <section className="form-section">
         <div className="section-title">
           <span className="section-number">05</span>
-          <span className="section-text">Situación Actual y Motivo</span>
+          <span className="section-text">Motivo y Antecedentes de Consulta</span>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          <FormField label="¿Cuándo se sintió bien por última vez?" required={!readOnly}>
-            <textarea
-              name="ultimaVezBien"
-              value={antecedentes.ultimaVezBien}
-              onChange={handleChange}
-              className="textarea-academic"
-              placeholder="Describa..."
-              readOnly={readOnly}
-              disabled={readOnly}
-            />
-          </FormField>
-          <FormField label="Desarrollo de los síntomas" required={!readOnly}>
-            <textarea
-              name="desarrolloSintomas"
-              value={antecedentes.desarrolloSintomas}
-              onChange={handleChange}
-              className="textarea-academic"
-              placeholder="Describa..."
-              readOnly={readOnly}
-              disabled={readOnly}
-            />
-          </FormField>
-          <FormField label="Antecedentes Familiares">
-            <textarea
-              name="antecedentesFamiliares"
-              value={antecedentes.antecedentesFamiliares}
-              onChange={handleChange}
-              className="textarea-academic"
-              placeholder="Describa..."
-              readOnly={readOnly}
-              disabled={readOnly}
-            />
-          </FormField>
-        </div>
-      </section>
 
-      <section className="form-section">
-        <div className="section-title">
-          <span className="section-number">06</span>
-          <span className="section-text">Funciones Orgánicas</span>
-        </div>
-        <div className="grid-fields">
-          <FormField label="Sueño">
-            <input 
-              name="sueno" 
-              value={antecedentes.sueno} 
-              onChange={handleChange} 
-              className="input-academic"
-              readOnly={readOnly}
-              disabled={readOnly}
-            />
-          </FormField>
-          <FormField label="Apetito">
-            <input 
-              name="apetito" 
-              value={antecedentes.apetito} 
-              onChange={handleChange} 
-              className="input-academic"
-              readOnly={readOnly}
-              disabled={readOnly}
-            />
-          </FormField>
-          <FormField label="Sed">
-            <input 
-              name="sed" 
-              value={antecedentes.sed} 
-              onChange={handleChange} 
-              className="input-academic"
-              readOnly={readOnly}
-              disabled={readOnly}
-            />
-          </FormField>
-          <FormField label="Defecación">
-            <input 
-              name="defecacion" 
-              value={antecedentes.defecacion} 
-              onChange={handleChange} 
-              className="input-academic"
-              readOnly={readOnly}
-              disabled={readOnly}
-            />
-          </FormField>
-        </div>
+        {!readOnly && (
+          <div style={{ 
+            marginBottom: '24px', 
+            padding: '20px', 
+            backgroundColor: '#f1f5f9', 
+            borderRadius: '8px',
+            border: '2px solid #cbd5e1'
+          }}>
+            
+            <ul style={{ margin: 0, paddingLeft: '20px', color: '#475569', lineHeight: '1.8' }}>
+              <p>¿Cuál es el motivo de consulta?, ¿Cuándo comenzaron los síntomas o problemas?, 
+                ¿Cuándo fue la última vez que se sintió bien?,¿Hay antecedentes familiares relevantes?,
+                ¿Qué factores cree que han contribuido a la situación actual?
+              </p>
+            </ul>
+            <p style={{ 
+              margin: '16px 0 0 0', 
+              fontSize: '13px', 
+              color: '#64748b', 
+              fontStyle: 'italic' 
+            }}>
+              * Estas preguntas son solo una guía. Redacte un párrafo narrativo que integre la información relevante.
+            </p>
+          </div>
+        )}
+
+        <FormField 
+          label="Redacte el motivo de consulta y los antecedentes relevantes del paciente" 
+          required={!readOnly}
+        >
+          <textarea
+            name="motivoConsulta"
+            value={antecedentes.motivoConsulta || ''}
+            onChange={handleChange}
+            className="textarea-academic"
+            rows={12}
+            placeholder="Escriba aquí un relato narrativo del motivo de consulta, incluyendo cuándo comenzaron los síntomas, cómo han evolucionado, antecedentes familiares relevantes, etc..."
+            readOnly={readOnly}
+            disabled={readOnly}
+            style={{ fontSize: '15px', lineHeight: '1.6' }}
+          />
+        </FormField>
       </section>
     </>
   );

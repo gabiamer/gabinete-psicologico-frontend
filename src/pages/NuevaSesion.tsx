@@ -15,16 +15,10 @@ const NuevaSesion: React.FC = () => {
   const [numeroSesion, setNumeroSesion] = useState(1);
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
   const [hora, setHora] = useState(new Date().toTimeString().slice(0, 5));
-  const [tipoSesion, setTipoSesion] = useState('Seguimiento');
   const [gravedad, setGravedad] = useState<'leve' | 'moderado' | 'grave'>('leve');
   const [tipologias, setTipologias] = useState<string[]>([]);
   const [otraTipologia, setOtraTipologia] = useState('');
   const [notas, setNotas] = useState('');
-  const [objetivos, setObjetivos] = useState('');
-  const [avances, setAvances] = useState('');
-  const [tareas, setTareas] = useState('');
-  const [proximaSesionFecha, setProximaSesionFecha] = useState('');
-  const [proximaSesionHora, setProximaSesionHora] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -36,8 +30,6 @@ const NuevaSesion: React.FC = () => {
     try {
       const data = await pacienteService.obtenerPorId(Number(id));
       setPaciente(data);
-      
-      // Obtener número de sesión
       const sesiones = await sesionService.obtenerPorPaciente(Number(id));
       setNumeroSesion(sesiones.length + 1);
     } catch (err) {
@@ -67,33 +59,23 @@ const NuevaSesion: React.FC = () => {
     setError('');
 
     try {
-      // Crear objeto con los datos de la sesión siguiendo el formato de historia clínica
       const acuerdosData = {
         numeroSesion,
-        tipoSesion,
         gravedad,
         tipologias: tipologias.join(', '),
         notasSesion: notas,
-        objetivosSesion: objetivos,
-        avancesPaciente: avances,
-        tareasAsignadas: tareas,
-        proximaSesionFecha: proximaSesionFecha || null,
-        proximaSesionHora: proximaSesionHora || null
       };
 
       const sesionData = {
         fecha: `${fecha}T${hora}:00`,
-        tipo: tipoSesion,
-        acuerdos: acuerdosData // Enviar como objeto, el backend lo convertirá a JSON si es necesario
+        acuerdos: acuerdosData
       };
 
-      console.log('Enviando sesión:', sesionData);
-
       await sesionService.crear(Number(id), sesionData);
-      navigate(`/pacientes/${id}/historial`);
+      await new Promise(resolve => setTimeout(resolve, 500));
+      navigate(`/pacientes/${id}/historial`, { replace: true });
     } catch (err: any) {
       console.error('Error guardando sesión:', err);
-      console.error('Respuesta del servidor:', err.response?.data);
       setError(err.response?.data?.message || 'Error al guardar la sesión');
       setLoading(false);
     }
@@ -122,6 +104,8 @@ const NuevaSesion: React.FC = () => {
         {error && <div className="alert alert-error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="form-content">
+
+          {/* DATOS DE LA SESIÓN */}
           <section className="form-section">
             <div className="section-title">
               <span className="section-number">📝</span>
@@ -137,19 +121,6 @@ const NuevaSesion: React.FC = () => {
                   className="input-academic"
                   min="1"
                 />
-              </FormField>
-
-              <FormField label="Tipo de sesión" required>
-                <select
-                  value={tipoSesion}
-                  onChange={(e) => setTipoSesion(e.target.value)}
-                  className="input-academic"
-                >
-                  <option value="Seguimiento">Seguimiento</option>
-                  <option value="Evaluación">Evaluación</option>
-                  <option value="Intervención">Intervención</option>
-                  <option value="Cierre">Cierre</option>
-                </select>
               </FormField>
             </div>
 
@@ -175,6 +146,25 @@ const NuevaSesion: React.FC = () => {
             </div>
           </section>
 
+          {/* HISTORIA CLÍNICA */}
+          <section className="form-section">
+            <div className="section-title">
+              <span className="section-number">📋</span>
+              <span className="section-text">Historia Clínica</span>
+            </div>
+
+            <FormField label="Historia Clínica">
+              <textarea
+                value={notas}
+                onChange={(e) => setNotas(e.target.value)}
+                className="textarea-academic"
+                rows={10}
+                placeholder="Escriba aquí el contenido de la sesión..."
+              />
+            </FormField>
+          </section>
+
+          {/* GRAVEDAD */}
           <section className="form-section">
             <div className="section-title">
               <span className="section-number">⚠️</span>
@@ -215,6 +205,7 @@ const NuevaSesion: React.FC = () => {
             </div>
           </section>
 
+          {/* TIPOLOGÍA */}
           <section className="form-section">
             <div className="section-title">
               <span className="section-number">🏷️</span>
@@ -306,81 +297,6 @@ const NuevaSesion: React.FC = () => {
             )}
           </section>
 
-          <section className="form-section">
-            <div className="section-title">
-              <span className="section-number">📋</span>
-              <span className="section-text">Contenido de la Sesión</span>
-            </div>
-
-            <FormField label="Objetivos de la sesión">
-              <textarea
-                value={objetivos}
-                onChange={(e) => setObjetivos(e.target.value)}
-                className="textarea-academic"
-                rows={3}
-                placeholder="¿Qué se trabajó en esta sesión? ¿Cuáles fueron los objetivos?"
-              />
-            </FormField>
-
-            <FormField label="Observaciones y notas principales">
-              <textarea
-                value={notas}
-                onChange={(e) => setNotas(e.target.value)}
-                className="textarea-academic"
-                rows={6}
-                placeholder="Describa lo ocurrido en la sesión, temas tratados, reacciones del paciente, etc."
-              />
-            </FormField>
-
-            <FormField label="Avances y evolución del paciente">
-              <textarea
-                value={avances}
-                onChange={(e) => setAvances(e.target.value)}
-                className="textarea-academic"
-                rows={4}
-                placeholder="¿Qué avances se observaron? ¿Hay mejoras o retrocesos?"
-              />
-            </FormField>
-
-            <FormField label="Tareas o ejercicios asignados">
-              <textarea
-                value={tareas}
-                onChange={(e) => setTareas(e.target.value)}
-                className="textarea-academic"
-                rows={4}
-                placeholder="Tareas para realizar antes de la próxima sesión"
-              />
-            </FormField>
-          </section>
-
-          <section className="form-section">
-            <div className="section-title">
-              <span className="section-number">📅</span>
-              <span className="section-text">Próxima Sesión</span>
-            </div>
-
-            <div className="grid-2-cols">
-              <FormField label="Fecha de la próxima sesión">
-                <input
-                  type="date"
-                  value={proximaSesionFecha}
-                  onChange={(e) => setProximaSesionFecha(e.target.value)}
-                  className="input-academic"
-                  min={new Date().toISOString().split('T')[0]}
-                />
-              </FormField>
-
-              <FormField label="Hora de la próxima sesión">
-                <input
-                  type="time"
-                  value={proximaSesionHora}
-                  onChange={(e) => setProximaSesionHora(e.target.value)}
-                  className="input-academic"
-                />
-              </FormField>
-            </div>
-          </section>
-
           <div className="actions-footer">
             <button
               type="button"
@@ -394,6 +310,7 @@ const NuevaSesion: React.FC = () => {
               {loading ? 'Guardando...' : '✓ Guardar Sesión'}
             </button>
           </div>
+
         </form>
       </div>
     </div>

@@ -56,6 +56,7 @@ const BuscarPaciente: React.FC = () => {
   };
 
   const verPaciente = (paciente: any) => {
+    console.log('Paciente completo:', JSON.stringify(paciente, null, 2));
     if (paciente.tipo === 'universitario') {
       navigate(`/pacientes/${paciente.id}/historial`);
     } else {

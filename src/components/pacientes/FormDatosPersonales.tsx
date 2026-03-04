@@ -139,6 +139,9 @@ export const FormDatosPersonales: React.FC<Props> = ({
             />
           </FormField>
         </div>
+        <p style={{ fontSize: '13px', color: '#64748b', marginTop: '4px', fontStyle: 'italic' }}>
+          * Al menos un apellido es obligatorio
+        </p>
       </section>
 
       <section className="form-section">
