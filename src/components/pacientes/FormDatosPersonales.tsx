@@ -1,7 +1,7 @@
 // src/components/pacientes/FormDatosPersonales.tsx
 import React, { useRef, useEffect, useState } from 'react';
 import { FormField } from '../shared/FormField';
-import { FormData, Psicologo, Carrera } from '../../types/types';
+import type { FormData, Psicologo, Carrera } from '../../types/types';
 import { carreraService } from '../../services/carreraService';
 
 interface Props {

@@ -1,6 +1,6 @@
 // src/services/orientacionService.ts
 import api from './api';
-import { OrientacionVocacionalData } from '../types/types';
+import type { OrientacionVocacionalData } from '../types/types';
 
 export const orientacionService = {
   guardarEntrevista: async (pacienteExternoId: number, orientacion: OrientacionVocacionalData) => {

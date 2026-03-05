@@ -1,6 +1,6 @@
 // src/components/pacientes/FormEvaluacion.tsx
 import React, { useState } from 'react';
-import { AntecedentesData } from '../../types/types';
+import type { AntecedentesData } from '../../types/types';
 
 const TIPOLOGIAS = ['Estrés', 'Baja autoestima', 'Ansiedad', 'Depresión', 'Problemas familiares', 'Problemas académicos'];
 

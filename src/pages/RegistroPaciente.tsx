@@ -1,7 +1,7 @@
 // src/pages/RegistroPaciente.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FormData, AntecedentesData, Psicologo } from '../types/types';
+import type { FormData, AntecedentesData, Psicologo } from '../types/types';
 import { pacienteService } from '../services/pacienteService';
 import { calcularEdad } from '../utils/calculos';
 import { FormDatosPersonales } from '../components/pacientes/FormDatosPersonales';
@@ -38,7 +38,6 @@ const RegistroPaciente: React.FC = () => {
     celular: '',
     fechaNacimiento: '',
     edad: '',
-    genero: 1,
     domicilio: '',
     estadoCivil: 1,
     semestre: 1,
@@ -120,7 +119,7 @@ const RegistroPaciente: React.FC = () => {
     }
     setFormData(prev => ({
       ...prev,
-      [name]: ['genero', 'estadoCivil', 'semestre', 'edad'].includes(name)
+      [name]: ['estadoCivil', 'semestre', 'edad'].includes(name)
         ? value === '' ? '' : parseInt(value)
         : value
     }));
@@ -277,8 +276,9 @@ const RegistroPaciente: React.FC = () => {
         {paso === 5 && (
           <form onSubmit={(e) => avanzar(e, 6)} className="form-content" noValidate>
             <FormUniversidad
-              formData={formData} antecedentes={antecedentes}
-              setFormData={setFormData} setAntecedentes={setAntecedentes} handleChange={handleChangeStep2}
+              antecedentes={antecedentes}
+              setAntecedentes={setAntecedentes}
+              handleChange={handleChangeStep2}
             />
             <div className="actions-footer">{btnVolver(4)}<button type="submit" className="btn-submit">Continuar</button></div>
           </form>

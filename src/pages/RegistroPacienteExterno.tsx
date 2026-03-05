@@ -1,7 +1,7 @@
 // src/pages/RegistroPacienteExterno.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FormData } from '../types/types';
+import type { FormData } from '../types/types';
 import { pacienteExternoService } from '../services/pacienteExternoService';
 import { calcularEdad } from '../utils/calculos';
 import { FormField } from '../components/shared/FormField';
@@ -18,7 +18,6 @@ const RegistroPacienteExterno: React.FC = () => {
     celular: '',
     fechaNacimiento: '',
     edad: '',
-    genero: 1,
     domicilio: '',
     estadoCivil: 1,
     semestre: 1,
@@ -45,7 +44,7 @@ const RegistroPacienteExterno: React.FC = () => {
 
     setFormData(prev => ({
       ...prev,
-      [name]: ['genero', 'estadoCivil', 'edad'].includes(name)
+      [name]: ['estadoCivil', 'edad'].includes(name)
         ? value === '' ? '' : parseInt(value)
         : value
     }));
@@ -94,7 +93,6 @@ const RegistroPacienteExterno: React.FC = () => {
         },
         fechaNacimiento: formData.fechaNacimiento,
         edad: formData.edad || null,
-        genero: formData.genero,
         domicilio: formData.domicilio,
         estadoCivil: formData.estadoCivil,
         escuela,
@@ -198,14 +196,6 @@ const RegistroPacienteExterno: React.FC = () => {
                 <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
                   Se calcula automáticamente
                 </p>
-              </FormField>
-
-              <FormField label="Sexo" required>
-                <select name="genero" value={formData.genero} onChange={handleChange} className="input-academic">
-                  <option value={1}>Masculino</option>
-                  <option value={2}>Femenino</option>
-                  <option value={3}>Otro</option>
-                </select>
               </FormField>
 
               <FormField label="Estado Civil">

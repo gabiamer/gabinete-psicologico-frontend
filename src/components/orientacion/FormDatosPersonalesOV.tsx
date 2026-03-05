@@ -1,7 +1,7 @@
 // src/components/orientacion/FormDatosPersonalesOV.tsx
 import React from 'react';
 import { FormField } from '../shared/FormField';
-import { OrientacionVocacionalData, FormData } from '../../types/types';
+import type { OrientacionVocacionalData, FormData } from '../../types/types';
 
 interface Props {
     formData: FormData;
@@ -38,19 +38,6 @@ export const FormDatosPersonalesOV: React.FC<Props> = ({
                             className="input-academic"
                             style={{ backgroundColor: '#f1f5f9', cursor: 'not-allowed' }}
                         />
-                    </FormField>
-
-                    <FormField label="Sexo" required>
-                        <select
-                            name="genero"
-                            value={formData.genero}
-                            onChange={handleChangeFormData}
-                            className="input-academic"
-                        >
-                            <option value={1}>Masculino</option>
-                            <option value={2}>Femenino</option>
-                            <option value={3}>Otro</option>
-                        </select>
                     </FormField>
 
                     <FormField label="Fecha de nacimiento" required>

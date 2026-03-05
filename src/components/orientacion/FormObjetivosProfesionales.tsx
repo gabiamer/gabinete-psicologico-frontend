@@ -1,7 +1,7 @@
 // src/components/orientacion/FormObjetivosProfesionales.tsx
 import React from 'react';
 import { FormField } from '../shared/FormField';
-import { OrientacionVocacionalData } from '../../types/types';
+import type { OrientacionVocacionalData } from '../../types/types';
 
 interface Props {
     orientacion: OrientacionVocacionalData;

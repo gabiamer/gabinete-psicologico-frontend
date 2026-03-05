@@ -1,21 +1,17 @@
 // src/components/pacientes/FormUniversidad.tsx
 import React from 'react';
 import { FormField } from '../shared/FormField';
-import { AntecedentesData, FormData } from '../../types/types';
+import type { AntecedentesData } from '../../types/types';
 
 interface Props {
-  formData: FormData;
   antecedentes: AntecedentesData;
-  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
   setAntecedentes: React.Dispatch<React.SetStateAction<AntecedentesData>>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   readOnly?: boolean;
 }
 
 export const FormUniversidad: React.FC<Props> = ({
-  formData,
   antecedentes,
-  setFormData,
   setAntecedentes,
   handleChange,
   readOnly = false
@@ -29,26 +25,6 @@ export const FormUniversidad: React.FC<Props> = ({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <FormField label="Semestre actual">
-            <input
-              type="number"
-              value={formData.semestre}
-              onChange={(e) => !readOnly && setFormData(prev => ({ ...prev, semestre: parseInt(e.target.value) || 1 }))}
-              className="input-academic"
-              min="1"
-              max="14"
-              readOnly={readOnly}
-              disabled={readOnly}
-            />
-            {!readOnly && (
-              <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
-                Se puede actualizar si es necesario
-              </p>
-            )}
-          </FormField>
-
-          {/* SECCIÓN ELIMINADA - Los radio buttons de satisfacción, rendimiento, estrés, interacción */}
-
           <FormField label="¿Ha cambiado de carrera?">
             {readOnly ? (
               <input

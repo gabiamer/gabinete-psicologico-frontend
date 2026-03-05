@@ -64,7 +64,7 @@ const BuscarPaciente: React.FC = () => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       buscarPaciente();
     }
@@ -97,7 +97,7 @@ const BuscarPaciente: React.FC = () => {
                     type="text"
                     value={terminoBusqueda}
                     onChange={(e) => setTerminoBusqueda(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyDown}
                     className="input-academic"
                     placeholder="Ej. Juan Pérez, 70123456, correo@ejemplo.com"
                     autoFocus

@@ -59,16 +59,14 @@ const NuevaSesion: React.FC = () => {
     setError('');
 
     try {
-      const acuerdosData = {
-        numeroSesion,
-        gravedad,
-        tipologias: tipologias.join(', '),
-        notasSesion: notas,
-      };
-
       const sesionData = {
         fecha: `${fecha}T${hora}:00`,
-        acuerdos: acuerdosData
+        historialClinico: {
+          nroSesion: numeroSesion,
+          historia: notas,
+          gravedad: gravedad,
+          tipologias: tipologias
+        }
       };
 
       await sesionService.crear(Number(id), sesionData);
@@ -242,7 +240,7 @@ const NuevaSesion: React.FC = () => {
                 type="text"
                 value={otraTipologia}
                 onChange={(e) => setOtraTipologia(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), agregarOtraTipologia())}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), agregarOtraTipologia())}
                 placeholder="Agregar otra tipología..."
                 className="input-academic"
                 style={{ flex: 1 }}

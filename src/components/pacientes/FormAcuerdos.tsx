@@ -1,7 +1,7 @@
 // src/components/pacientes/FormAcuerdos.tsx
 import React from 'react';
 import { FormField } from '../shared/FormField';
-import { AntecedentesData, FormData } from '../../types/types';
+import type { AntecedentesData, FormData } from '../../types/types';
 import { calcularTotal, interpretarResultado } from '../../utils/calculos';
 
 interface Props {

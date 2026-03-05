@@ -1,8 +1,7 @@
 // src/pages/EntrevistaOrientacionVocacional.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FormData, OrientacionVocacionalData, Psicologo } from '../types/types';
-import { pacienteService } from '../services/pacienteService';
+import type { FormData, OrientacionVocacionalData } from '../types/types';
 import { orientacionService } from '../services/orientacionService';
 import { calcularEdad } from '../utils/calculos';
 import { FormDatosPersonalesOV } from '../components/orientacion/FormDatosPersonalesOV';
@@ -21,7 +20,7 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const [paso, setPaso] = useState<1 | 2 | 3>(1);
-    const [pacienteCargado, setPacienteCargado] = useState(false);
+    const [, setPacienteCargado] = useState(false);
 
     const [formData, setFormData] = useState<FormData>({
         primerNombre: '',
@@ -31,7 +30,6 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
         celular: '',
         fechaNacimiento: '',
         edad: '',
-        genero: 1,
         domicilio: '',
         estadoCivil: 1,
         semestre: 1,
@@ -106,7 +104,6 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
                 celular: data.paciente?.person?.celular || '',
                 fechaNacimiento: data.paciente?.fechaNacimiento || '',
                 edad: data.paciente?.edad || '',
-                genero: data.paciente?.genero || 1,
                 domicilio: data.paciente?.domicilio || '',
                 estadoCivil: data.paciente?.estadoCivil || 1,
                 semestre: data.anio || 1,
@@ -131,7 +128,7 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
 
         setFormData(prev => ({
             ...prev,
-            [name]: ['genero', 'estadoCivil', 'semestre', 'edad'].includes(name)
+            [name]: ['estadoCivil', 'semestre', 'edad'].includes(name)
                 ? value === '' ? '' : parseInt(value)
                 : value
         }));

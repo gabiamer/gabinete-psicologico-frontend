@@ -8,7 +8,7 @@ import { FormSintomatologia } from '../components/pacientes/FormSintomatologia';
 import { FormUniversidad } from '../components/pacientes/FormUniversidad';
 import { FormEvaluacion } from '../components/pacientes/FormEvaluacion';
 import { FormAcuerdos } from '../components/pacientes/FormAcuerdos';
-import { FormData, AntecedentesData } from '../types/types';
+import type { FormData, AntecedentesData } from '../types/types';
 import './RegistroPaciente.css';
 
 const DetalleSesion: React.FC = () => {
@@ -56,21 +56,76 @@ const DetalleSesion: React.FC = () => {
     );
   }
 
-  // Parsear acuerdos
-  let data: any = {};
-  if (sesion.acuerdos) {
-    if (typeof sesion.acuerdos === 'string') {
-      try {
-        data = JSON.parse(sesion.acuerdos);
-      } catch (e) {
-        console.error('Error parseando acuerdos:', e);
-      }
-    } else if (typeof sesion.acuerdos === 'object') {
-      data = sesion.acuerdos;
-    }
+  // Datos de entrevista psicologica (primera sesion)
+  const entrevista = sesion.entrevista;
+  // Datos de historial clinico
+  const historialClinico = sesion.historialClinico;
+
+  // Parsear datos de la entrevista para los componentes
+  let entrevistaData: any = {};
+  if (entrevista) {
+    // Parsear campos JSONB de la entrevista
+    const parseJson = (val: any) => {
+      if (!val) return {};
+      if (typeof val === 'string') { try { return JSON.parse(val); } catch { return {}; } }
+      return val;
+    };
+    const familia = parseJson(entrevista.historiaFamiliar);
+    const universidad = parseJson(entrevista.relatoUniversidad);
+    const habitos = parseJson(entrevista.habitos);
+    const acuerdos = parseJson(entrevista.acuerdos);
+    const sintomasData = parseJson(entrevista.sintomas);
+
+    entrevistaData = {
+      motivoConsulta: entrevista.antecedentes || '',
+      conQuienVive: familia.conQuienVive || '',
+      personaReferencia: familia.personaReferencia || '',
+      celularReferencia: familia.celularReferencia || '',
+      nombrePadre: familia.padre?.nombre || '',
+      ocupacionPadre: familia.padre?.ocupacion || '',
+      enfermedadPadre: familia.padre?.enfermedad || '',
+      relacionPadre: familia.padre?.relacion || '',
+      nombreMadre: familia.madre?.nombre || '',
+      ocupacionMadre: familia.madre?.ocupacion || '',
+      enfermedadMadre: familia.madre?.enfermedad || '',
+      relacionMadre: familia.madre?.relacion || '',
+      numeroHermanos: familia.hermanos?.numero || '',
+      relatoHermanos: familia.hermanos?.relato || '',
+      cambioCarreras: universidad.cambioCarreras || '',
+      motivosCambio: universidad.motivosCambio || '',
+      relatoUniversidad: universidad.relatoGeneral || '',
+      consumoAlcohol: habitos.alcohol?.descripcion || '',
+      frecuenciaAlcohol: habitos.alcohol?.frecuencia || 0,
+      consumoTabaco: habitos.tabaco?.descripcion || '',
+      frecuenciaTabaco: habitos.tabaco?.frecuencia || 0,
+      consumoDrogas: habitos.drogas?.descripcion || '',
+      frecuenciaDrogas: habitos.drogas?.frecuencia || 0,
+      relatoAcusacionDetencion: habitos.relatoAcusacionDetencion || '',
+      acuerdosEstablecidos: acuerdos.acuerdosEstablecidos || '',
+      proximaSesionFecha: acuerdos.proximaSesionFecha || '',
+      proximaSesionHora: acuerdos.proximaSesionHora || '',
+      sintomatologias: sintomasData,
+      totalScoreEstres: entrevista.totalScoreEstres,
+      totalScoreAnsiedad: entrevista.totalScoreAnsiedad,
+      totalScoreDepresion: entrevista.totalScoreDepresion,
+    };
   }
 
-  console.log('Acuerdos parseados:', data);
+  // Parsear historial clinico
+  let historialData: any = {};
+  if (historialClinico) {
+    historialData = {
+      nroSesion: historialClinico.nroSesion,
+      historia: historialClinico.historia || '',
+      gravedad: historialClinico.gravedad || '',
+      tipologias: (() => {
+        const t = historialClinico.tipologia;
+        if (!t) return [];
+        if (typeof t === 'string') { try { return JSON.parse(t); } catch { return []; } }
+        return Array.isArray(t) ? t : [];
+      })()
+    };
+  }
 
   const paciente = sesion.pacienteUniversitario?.paciente;
   const person = paciente?.person;
@@ -83,7 +138,6 @@ const DetalleSesion: React.FC = () => {
     celular: person?.celular || '',
     fechaNacimiento: paciente?.fechaNacimiento || '',
     edad: paciente?.edad || '',
-    genero: paciente?.genero || 1,
     domicilio: paciente?.domicilio || '',
     estadoCivil: paciente?.estadoCivil || 1,
     semestre: sesion.pacienteUniversitario?.semestre || 1,
@@ -92,54 +146,52 @@ const DetalleSesion: React.FC = () => {
   };
 
   const antecedentes: AntecedentesData = {
-    motivoConsulta: data.motivoConsulta || '',
-    conQuienVive: data.conQuienVive || '',
-    personaReferencia: data.personaReferencia || '',
-    celularReferencia: data.celularReferencia || '',
-    nombrePadre: data.nombrePadre || '',
-    ocupacionPadre: data.ocupacionPadre || '',
-    enfermedadPadre: data.enfermedadPadre || '',
-    relacionPadre: data.relacionPadre || '',
-    nombreMadre: data.nombreMadre || '',
-    ocupacionMadre: data.ocupacionMadre || '',
-    enfermedadMadre: data.enfermedadMadre || '',
-    relacionMadre: data.relacionMadre || '',
-    numeroHermanos: data.numeroHermanos || '',
-    relatoHermanos: data.relatoHermanos || '',
-    cambioCarreras: data.cambioCarreras || '',
-    motivosCambio: data.motivosCambio || '',
-    relatoUniversidad: data.relatoUniversidad || '',
-    consumoAlcohol: data.consumoAlcohol || '',
-    frecuenciaAlcohol: data.frecuenciaAlcohol || 0,
-    consumoTabaco: data.consumoTabaco || '',
-    frecuenciaTabaco: data.frecuenciaTabaco || 0,
-    consumoDrogas: data.consumoDrogas || '',
-    frecuenciaDrogas: data.frecuenciaDrogas || 0,
-    relatoAcusacionDetencion: data.relatoAcusacionDetencion || '',
-    gravedad: data.gravedad || 'leve',
-    tipologias: data.tipologias || [],
-    acuerdosEstablecidos: data.acuerdosEstablecidos || '',
-    proximaSesionFecha: data.proximaSesionFecha || '',
-    proximaSesionHora: data.proximaSesionHora || ''
+    motivoConsulta: entrevistaData.motivoConsulta || '',
+    conQuienVive: entrevistaData.conQuienVive || '',
+    personaReferencia: entrevistaData.personaReferencia || '',
+    celularReferencia: entrevistaData.celularReferencia || '',
+    nombrePadre: entrevistaData.nombrePadre || '',
+    ocupacionPadre: entrevistaData.ocupacionPadre || '',
+    enfermedadPadre: entrevistaData.enfermedadPadre || '',
+    relacionPadre: entrevistaData.relacionPadre || '',
+    nombreMadre: entrevistaData.nombreMadre || '',
+    ocupacionMadre: entrevistaData.ocupacionMadre || '',
+    enfermedadMadre: entrevistaData.enfermedadMadre || '',
+    relacionMadre: entrevistaData.relacionMadre || '',
+    numeroHermanos: entrevistaData.numeroHermanos || '',
+    relatoHermanos: entrevistaData.relatoHermanos || '',
+    cambioCarreras: entrevistaData.cambioCarreras || '',
+    motivosCambio: entrevistaData.motivosCambio || '',
+    relatoUniversidad: entrevistaData.relatoUniversidad || '',
+    consumoAlcohol: entrevistaData.consumoAlcohol || '',
+    frecuenciaAlcohol: entrevistaData.frecuenciaAlcohol || 0,
+    consumoTabaco: entrevistaData.consumoTabaco || '',
+    frecuenciaTabaco: entrevistaData.frecuenciaTabaco || 0,
+    consumoDrogas: entrevistaData.consumoDrogas || '',
+    frecuenciaDrogas: entrevistaData.frecuenciaDrogas || 0,
+    relatoAcusacionDetencion: entrevistaData.relatoAcusacionDetencion || '',
+    gravedad: historialData.gravedad || 'leve',
+    tipologias: historialData.tipologias || [],
+    acuerdosEstablecidos: entrevistaData.acuerdosEstablecidos || '',
+    proximaSesionFecha: entrevistaData.proximaSesionFecha || '',
+    proximaSesionHora: entrevistaData.proximaSesionHora || ''
   };
 
   const sintomatologias = {
-    estres: data.sintomatologias?.estres || Array(12).fill(1),
-    ansiedad: data.sintomatologias?.ansiedad || Array(12).fill(1),
-    depresion: data.sintomatologias?.depresion || Array(12).fill(1)
+    estres: entrevistaData.sintomatologias?.estres || Array(12).fill(1),
+    ansiedad: entrevistaData.sintomatologias?.ansiedad || Array(12).fill(1),
+    depresion: entrevistaData.sintomatologias?.depresion || Array(12).fill(1)
   };
 
-  // Si tiene numeroSesion en acuerdos → sesión de seguimiento
-  // Si tiene motivoConsulta o sintomatologias → entrevista inicial
-  const esEntrevistaInicial = !data.numeroSesion && (data.motivoConsulta || data.sintomatologias);
-  const esSesionSeguimiento = !!data.numeroSesion;
+  const esEntrevistaInicial = !!entrevista;
+  const esSesionSeguimiento = !entrevista && !!historialClinico;
   const sinDatos = !esEntrevistaInicial && !esSesionSeguimiento;
 
   return (
     <div className="registro-wrapper">
       <div className="card-academic">
         <header className="banner-header">
-          <h1>Detalle de Sesión #{data.numeroSesion || sesion.id}</h1>
+          <h1>Detalle de Sesión #{historialData.nroSesion || sesion.id}</h1>
           <p>
             {new Date(sesion.fecha).toLocaleDateString('es-ES', {
               weekday: 'long',
@@ -191,9 +243,7 @@ const DetalleSesion: React.FC = () => {
               <FormHistoriaFamiliar antecedentes={antecedentes} readOnly />
               <FormSintomatologia sintomatologias={sintomatologias} readOnly />
               <FormUniversidad
-                formData={formData}
                 antecedentes={antecedentes}
-                setFormData={() => {}}
                 setAntecedentes={() => {}}
                 handleChange={() => {}}
                 readOnly
@@ -217,7 +267,7 @@ const DetalleSesion: React.FC = () => {
           {esSesionSeguimiento && (
             <>
               {/* Gravedad */}
-              {data.gravedad && (
+              {historialData.gravedad && (
                 <section className="form-section">
                   <div className="section-title">
                     <span className="section-number">⚠️</span>
@@ -226,13 +276,13 @@ const DetalleSesion: React.FC = () => {
                   <div className="form-group">
                     <input
                       type="text"
-                      value={data.gravedad.charAt(0).toUpperCase() + data.gravedad.slice(1)}
+                      value={historialData.gravedad.charAt(0).toUpperCase() + historialData.gravedad.slice(1)}
                       className="form-input"
                       readOnly disabled
                       style={{
                         backgroundColor:
-                          data.gravedad === 'leve' ? '#d1fae5' :
-                          data.gravedad === 'moderado' ? '#fef3c7' : '#fee2e2',
+                          historialData.gravedad === 'leve' ? '#d1fae5' :
+                          historialData.gravedad === 'moderado' ? '#fef3c7' : '#fee2e2',
                         fontWeight: '600'
                       }}
                     />
@@ -241,37 +291,33 @@ const DetalleSesion: React.FC = () => {
               )}
 
               {/* Tipologías */}
-              {data.tipologias && (
+              {historialData.tipologias && historialData.tipologias.length > 0 && (
                 <section className="form-section">
                   <div className="section-title">
                     <span className="section-number">🏷️</span>
                     <span className="section-text">Tipología</span>
                   </div>
                   <div style={{ padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                    {typeof data.tipologias === 'string' ? (
-                      <span>{data.tipologias}</span>
-                    ) : Array.isArray(data.tipologias) && data.tipologias.length > 0 ? (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                        {data.tipologias.map((tip: string, idx: number) => (
-                          <span key={idx} style={{
-                            padding: '6px 12px',
-                            backgroundColor: '#eff6ff',
-                            border: '2px solid #3b82f6',
-                            borderRadius: '16px',
-                            fontSize: '14px',
-                            fontWeight: '500'
-                          }}>
-                            {tip}
-                          </span>
-                        ))}
-                      </div>
-                    ) : <span style={{ color: '#94a3b8' }}>Sin tipologías registradas</span>}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {historialData.tipologias.map((tip: string, idx: number) => (
+                        <span key={idx} style={{
+                          padding: '6px 12px',
+                          backgroundColor: '#eff6ff',
+                          border: '2px solid #3b82f6',
+                          borderRadius: '16px',
+                          fontSize: '14px',
+                          fontWeight: '500'
+                        }}>
+                          {tip}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </section>
               )}
 
               {/* Historia Clínica */}
-              {data.notasSesion && (
+              {historialData.historia && (
                 <section className="form-section">
                   <div className="section-title">
                     <span className="section-number">📋</span>
@@ -279,7 +325,7 @@ const DetalleSesion: React.FC = () => {
                   </div>
                   <div className="form-group">
                     <textarea
-                      value={data.notasSesion}
+                      value={historialData.historia}
                       className="form-input"
                       rows={10}
                       readOnly disabled

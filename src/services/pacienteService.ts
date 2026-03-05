@@ -1,6 +1,6 @@
 // src/services/pacienteService.ts
 import api from './api';
-import { FormData, AntecedentesData } from '../types/types';
+import type { FormData, AntecedentesData } from '../types/types';
 
 export const pacienteService = {
   // Buscar en AMBOS tipos de pacientes (universitarios y externos) con filtro opcional de fecha
@@ -55,7 +55,6 @@ export const pacienteService = {
       },
       fechaNacimiento: formData.fechaNacimiento,
       edad: formData.edad || null,
-      genero: formData.genero,
       domicilio: formData.domicilio,
       estadoCivil: formData.estadoCivil,
       semestre: formData.semestre,
@@ -80,7 +79,6 @@ export const pacienteService = {
       },
       fechaNacimiento: formData.fechaNacimiento,
       edad: formData.edad || null,
-      genero: formData.genero,
       domicilio: formData.domicilio,
       estadoCivil: formData.estadoCivil,
       semestre: formData.semestre,

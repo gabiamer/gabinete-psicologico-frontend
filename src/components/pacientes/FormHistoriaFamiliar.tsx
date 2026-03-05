@@ -1,7 +1,7 @@
 // src/components/pacientes/FormHistoriaFamiliar.tsx
 import React from 'react';
 import { FormField } from '../shared/FormField';
-import { AntecedentesData } from '../../types/types';
+import type { AntecedentesData } from '../../types/types';
 
 interface Props {
   antecedentes: AntecedentesData;
