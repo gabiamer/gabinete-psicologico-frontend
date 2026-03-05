@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BotonReporteWord } from '@/components/shared/BotonReporteWord';
 import {
   Brain,
   Compass,
@@ -224,6 +225,7 @@ export default function Dashboard() {
               <RefreshCw className={cn('h-4 w-4 mr-2', loading && 'animate-spin')} />
               Actualizar
             </Button>
+            <BotonReporteWord />
             {activeTab === 'entrevistas' ? (
               <Button
                 onClick={() => navigate('/registro-paciente')}
