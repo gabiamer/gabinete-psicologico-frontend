@@ -219,7 +219,7 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
             await orientacionService.guardarEntrevista(Number(id), orientacion);
             setMensaje('¡Entrevista de orientación vocacional guardada exitosamente!');
             setTimeout(() => {
-                navigate('/buscar-paciente');
+                navigate('/');
             }, 2000);
         } catch (err: any) {
             setError('Error al guardar la entrevista');

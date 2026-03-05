@@ -236,6 +236,9 @@ const RegistroPaciente: React.FC = () => {
               handleChange={handleChangeStep1} seleccionarPsicologo={seleccionarPsicologo} setFormData={setFormData}
             />
             <div className="actions-footer">
+              <button type="button" className="btn-back-dashboard" onClick={() => navigate('/')}>
+                ← Volver al Dashboard
+              </button>
               <button type="submit" disabled={loading} className="btn-submit">
                 {loading ? 'Guardando...' : 'Guardar y Continuar'}
               </button>

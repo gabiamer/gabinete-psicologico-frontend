@@ -51,7 +51,7 @@ const DetalleOrientacionVocacional: React.FC = () => {
       <div className="registro-wrapper">
         <div className="card-academic">
           <div className="alert alert-error">{error || 'No se encontró entrevista de orientación vocacional para este paciente'}</div>
-          <button onClick={() => navigate('/buscar-paciente')} className="btn-submit">
+          <button onClick={() => navigate('/')} className="btn-submit">
             Volver a búsqueda
           </button>
         </div>
@@ -298,7 +298,7 @@ const DetalleOrientacionVocacional: React.FC = () => {
 
           {/* BOTÓN VOLVER */}
           <div className="actions-footer">
-            <button onClick={() => navigate('/buscar-paciente')} className="btn-submit" style={{ backgroundColor: '#64748b' }}>
+            <button onClick={() => navigate('/')} className="btn-submit" style={{ backgroundColor: '#64748b' }}>
               ← Volver a búsqueda
             </button>
           </div>

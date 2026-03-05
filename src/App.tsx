@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Dashboard from './pages/Dashboard';
 import BuscarPaciente from './pages/BuscarPaciente';
 import RegistroPaciente from './pages/RegistroPaciente';
 import RegistroPacienteExterno from './pages/RegistroPacienteExterno';
@@ -12,7 +13,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/buscar-paciente" replace />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/buscar-paciente" element={<BuscarPaciente />} />
         <Route path="/registro-paciente" element={<RegistroPaciente />} />
         <Route path="/registro-paciente-externo" element={<RegistroPacienteExterno />} />

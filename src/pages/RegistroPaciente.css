@@ -11,6 +11,28 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Botón de retorno al dashboard */
+.btn-back-dashboard {
+  background: transparent;
+  border: 2px solid #e2e8f0;
+  color: #475569;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.btn-back-dashboard:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e293b;
+  transform: translateX(-3px);
+}
+
 /* Barra de Progreso Académica */
 .stepper-container {
   display: flex;

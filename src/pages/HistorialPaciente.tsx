@@ -60,7 +60,7 @@ const HistorialPaciente: React.FC = () => {
             {error || "Paciente no encontrado"}
           </div>
           <button
-            onClick={() => navigate("/buscar-paciente")}
+            onClick={() => navigate("/")}
             className="btn-submit"
           >
             Volver a búsqueda
@@ -322,7 +322,7 @@ const HistorialPaciente: React.FC = () => {
         {/* BOTÓN NUEVA SESIÓN */}
         <div className="actions-footer" style={{ marginTop: "32px" }}>
           <button
-            onClick={() => navigate("/buscar-paciente")}
+            onClick={() => navigate("/")}
             className="btn-submit"
             style={{ backgroundColor: "#64748b" }}
           >

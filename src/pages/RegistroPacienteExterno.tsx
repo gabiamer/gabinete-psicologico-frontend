@@ -276,7 +276,7 @@ const RegistroPacienteExterno: React.FC = () => {
           <div className="actions-footer">
             <button
               type="button"
-              onClick={() => navigate('/buscar-paciente')}
+              onClick={() => navigate('/')}
               className="btn-submit"
               style={{ backgroundColor: '#64748b' }}
             >
