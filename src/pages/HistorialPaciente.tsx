@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { pacienteService } from "../services/pacienteService";
 import { sesionService } from "../services/sesionService";
+import { BotonReporteIndividualExcel } from '@/components/shared/BotonReporteIndividualExcel';
 import "./RegistroPaciente.css";
 
 const HistorialPaciente: React.FC = () => {
@@ -328,6 +329,7 @@ const HistorialPaciente: React.FC = () => {
           >
             ← Volver a búsqueda
           </button>
+          <BotonReporteIndividualExcel pacienteId={Number(id)} />
           <button
             onClick={irANuevaSesion}
             className="btn-submit"
