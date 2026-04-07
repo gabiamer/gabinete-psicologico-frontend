@@ -2,18 +2,16 @@
 export const Genero = {
   MASCULINO: 1,
   FEMENINO: 2,
-  OTRO: 3,
+  OTRO: 3
 } as const;
-export type Genero = (typeof Genero)[keyof typeof Genero];
 
 export const EstadoCivil = {
   SOLTERO: 1,
   CASADO: 2,
   DIVORCIADO: 3,
   VIUDO: 4,
-  CONCUBINATO: 5,
+  CONCUBINATO: 5
 } as const;
-export type EstadoCivil = (typeof EstadoCivil)[keyof typeof EstadoCivil];
 
 export interface Psicologo {
   id: number;
@@ -32,6 +30,7 @@ export interface FormData {
   celular: string;
   fechaNacimiento: string;
   edad: number | '';
+  genero: number;
   domicilio: string;
   estadoCivil: number;
   semestre: number;
@@ -40,7 +39,6 @@ export interface FormData {
   carreraId?: number;
 }
 
-// src/types/types.ts
 
 export interface AntecedentesData {
   // NUEVO: Campo único para motivo y antecedentes

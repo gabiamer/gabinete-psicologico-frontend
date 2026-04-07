@@ -140,6 +140,7 @@ const DetalleSesion: React.FC = () => {
     edad: paciente?.edad || '',
     domicilio: paciente?.domicilio || '',
     estadoCivil: paciente?.estadoCivil || 1,
+    genero: paciente?.genero || 0, 
     semestre: sesion.pacienteUniversitario?.semestre || 1,
     derivadoPor: sesion.pacienteUniversitario?.derivadoPor || '',
     psicologoId: sesion.psicologo?.id || ''
@@ -244,20 +245,20 @@ const DetalleSesion: React.FC = () => {
               <FormSintomatologia sintomatologias={sintomatologias} readOnly />
               <FormUniversidad
                 antecedentes={antecedentes}
-                setAntecedentes={() => {}}
-                handleChange={() => {}}
+                setAntecedentes={() => { }}
+                handleChange={() => { }}
                 readOnly
               />
               <FormAcuerdos
                 formData={formData}
                 antecedentes={antecedentes}
                 sintomatologias={sintomatologias}
-                handleChange={() => {}}
+                handleChange={() => { }}
                 readOnly
               />
               <FormEvaluacion
                 antecedentes={antecedentes}
-                setAntecedentes={() => {}}
+                setAntecedentes={() => { }}
                 readOnly
               />
             </>
@@ -282,7 +283,7 @@ const DetalleSesion: React.FC = () => {
                       style={{
                         backgroundColor:
                           historialData.gravedad === 'leve' ? '#d1fae5' :
-                          historialData.gravedad === 'moderado' ? '#fef3c7' : '#fee2e2',
+                            historialData.gravedad === 'moderado' ? '#fef3c7' : '#fee2e2',
                         fontWeight: '600'
                       }}
                     />
@@ -347,7 +348,7 @@ const DetalleSesion: React.FC = () => {
                 textAlign: 'center'
               }}>
                 <p style={{ margin: 0, color: '#92400e' }}>
-                  ℹ️ Esta sesión no contiene datos registrados.
+                  ℹ Esta sesión no contiene datos registrados.
                 </p>
               </div>
             </section>
