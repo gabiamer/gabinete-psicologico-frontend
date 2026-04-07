@@ -36,7 +36,7 @@ export const FormDatosPersonales: React.FC<Props> = ({
   const [loadingCarreras, setLoadingCarreras] = useState(false);
   const [mostrarOtraCarrera, setMostrarOtraCarrera] = useState(false);
   const [nuevaCarrera, setNuevaCarrera] = useState('');
-  const [departamento, setDepartamento] = useState(1);
+  const [departamento, setDepartamento] = useState('Ciencias de la Tecnología e Innovación (DCT)');
 
   // Cargar carreras al montar componente
   useEffect(() => {
@@ -181,6 +181,14 @@ export const FormDatosPersonales: React.FC<Props> = ({
               <option value={5}>Concubinato</option>
             </select>
           </FormField>
+          <FormField label="Género" required>
+            <select name="genero" value={formData.genero} onChange={handleChange} className="input-academic">
+              <option value="">Seleccione...</option>
+              <option value={1}>Masculino</option>
+              <option value={2}>Femenino</option>
+              <option value={3}>Otro</option>
+            </select>
+          </FormField>
           <FormField label="Teléfono Celular" required>
             <input
               type="tel"
@@ -281,16 +289,16 @@ export const FormDatosPersonales: React.FC<Props> = ({
               <FormField label="Departamento" required>
                 <select
                   value={departamento}
-                  onChange={(e) => setDepartamento(parseInt(e.target.value))}
+                  onChange={(e) => setDepartamento(e.target.value)}
                   className="input-academic"
                 >
-                  <option value={1}>Ciencias de la Tecnología e Innovación (DCT)</option>
-                  <option value={2}>Ciencias Industriales, Medio Ambiente y Energía (DCME)</option>
-                  <option value={3}>Ciencias de la Salud (DCS)</option>
-                  <option value={4}>Ciencias Empresariales (DCE)</option>
-                  <option value={5}>Ciencias Jurídicas y Sociales (DCJS)</option>
-                  <option value={6}>Arquitectura y Diseño Gráfico (DARQ)</option>
-                  <option value={7}>Ciencias Básicas e Infraestructura (DCI)</option>
+                  <option value="Ciencias de la Tecnología e Innovación (DCT)">Ciencias de la Tecnología e Innovación (DCT)</option>
+                  <option value="Ciencias Industriales, Medio Ambiente y Energía (DCME)">Ciencias Industriales, Medio Ambiente y Energía (DCME)</option>
+                  <option value="Ciencias de la Salud (DCS)">Ciencias de la Salud (DCS)</option>
+                  <option value="Ciencias Empresariales (DCE)">Ciencias Empresariales (DCE)</option>
+                  <option value="Ciencias Jurídicas y Sociales (DCJS)">Ciencias Jurídicas y Sociales (DCJS)</option>
+                  <option value="Arquitectura y Diseño Gráfico (DARQ)">Arquitectura y Diseño Gráfico (DARQ)</option>
+                  <option value="Ciencias Básicas e Infraestructura (DCI)">Ciencias Básicas e Infraestructura (DCI)</option>
                 </select>
               </FormField>
 

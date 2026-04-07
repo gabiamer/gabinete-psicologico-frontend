@@ -34,6 +34,7 @@ export interface FormData {
   edad: number | '';
   domicilio: string;
   estadoCivil: number;
+  genero: number | '';
   semestre: number;
   derivadoPor: string;
   psicologoId: number | '';
@@ -151,5 +152,5 @@ export interface OrientacionVocacionalData {
 export interface Carrera {
   id: number;
   carrera: string;
-  departamento: number;
+  departamento: string;
 }

@@ -1,161 +1,229 @@
-// src/components/shared/BotonReporteIndividualExcel.tsx
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { FileDown, Loader2 } from "lucide-react";
-import ExcelJS from "exceljs";
-import { saveAs } from "file-saver";
-import { pacienteService } from "@/services/pacienteService";
-import { sesionService } from "@/services/sesionService";
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { FileDown, Loader2 } from "lucide-react"
+import PizZip from "pizzip"
+import Docxtemplater from "docxtemplater"
+import { saveAs } from "file-saver"
+import { pacienteService } from "@/services/pacienteService"
+import { sesionService } from "@/services/sesionService"
+import { dashboardService } from "@/services/dashboardService"
+
+// ── Mapas ─────────────────────────────────────────────────────────────────────
+const GENERO_MAP: Record<number, string> = { 1: "Masculino", 2: "Femenino", 3: "Otro" }
+const ESTADO_CIVIL_MAP: Record<number, string> = {
+  1: "Soltero/a", 2: "Casado/a", 3: "Divorciado/a", 4: "Viudo/a", 5: "Concubinato",
+}
+
+function parse(val: unknown): Record<string, any> {
+  if (!val) return {}
+  if (typeof val === "string") { try { return JSON.parse(val) } catch { return {} } }
+  return val as Record<string, any>
+}
+
+// Limpia comillas escapadas que vienen del backend (e.g. "\"texto\"" → "texto")
+function limpiar(val: unknown): string {
+  if (val == null) return ""
+  const s = String(val).trim()
+  if (s.startsWith('"') && s.endsWith('"')) return s.slice(1, -1)
+  return s
+}
+
+function formatFecha(iso: string | null | undefined): string {
+  if (!iso) return ""
+  const d = new Date(iso)
+  return isNaN(d.getTime()) ? iso : d.toLocaleDateString("es-ES")
+}
 
 export function BotonReporteIndividualExcel({ pacienteId }: { pacienteId: number }) {
-  const [generando, setGenerando] = useState(false);
+  const [generando, setGenerando] = useState(false)
 
-  const generarExcel = async () => {
+  const generarDocumento = async () => {
     try {
-      setGenerando(true);
+      setGenerando(true)
 
-      // 1. Obtener datos reales del paciente y sus sesiones
-      const paciente = await pacienteService.obtenerPorId(pacienteId);
-      const sesiones = await sesionService.obtenerPorPaciente(pacienteId);
-      const antecedentes = paciente.antecedentes || {} as any;
+      // 1. Obtener datos del paciente, lista de sesiones y entrevistas del dashboard
+      const [pacienteRaw, sesionesRaw, todasEntrevistas] = await Promise.all([
+        pacienteService.obtenerPorId(pacienteId),
+        sesionService.obtenerPorPaciente(pacienteId),
+        dashboardService.obtenerEntrevistas(),
+      ])
 
-      // 2. Cargar tu plantilla desde public
-      const response = await fetch("/plantilla-entrevista.xlsx");
-      if (!response.ok) throw new Error("No se pudo cargar la plantilla. Verifica que esté en la carpeta public.");
-      const buffer = await response.arrayBuffer();
+      const pac = pacienteRaw as any
+      const sesiones: any[] = Array.isArray(sesionesRaw) ? sesionesRaw : []
 
-      const workbook = new ExcelJS.Workbook();
-      await workbook.xlsx.load(buffer);
-      const worksheet = workbook.getWorksheet(1);
-      
-      if (!worksheet) throw new Error("No se encontró la hoja de cálculo.");
+      const entrevistaRow = todasEntrevistas.find((e) => e.pacienteUniversitarioId === pacienteId)
+      const carreraStr = entrevistaRow?.carrera ?? ""
 
-      // --- DATOS PERSONALES ---
-      const nombreCompleto = `${paciente.person?.primerNombre || ''} ${paciente.person?.apellidoPaterno || ''} ${paciente.person?.apellidoMaterno || ''}`.trim();
-      worksheet.getCell("G8").value = nombreCompleto;
-      worksheet.getCell("C9").value = paciente.edad;
-      
-      const generos = { 1: 'Masculino', 2: 'Femenino', 3: 'Otro' };
-      worksheet.getCell("J9").value = generos[paciente.genero as keyof typeof generos] || '';
-      
-      worksheet.getCell("R9").value = paciente.domicilio || '';
-      if(paciente.fechaNacimiento) {
-        worksheet.getCell("J10").value = new Date(paciente.fechaNacimiento).toLocaleDateString('es-ES');
-      }
-      
-      const estadosCiviles = { 1: 'Soltero', 2: 'Casado', 3: 'Divorciado', 4: 'Viudo', 5: 'Concubinato' };
-      worksheet.getCell("E11").value = estadosCiviles[paciente.estadoCivil as keyof typeof estadosCiviles] || '';
-      
-      worksheet.getCell("R11").value = paciente.celular || '';
-      worksheet.getCell("H12").value = paciente.semestre || '';
-      // Asumiendo que carrera viene poblada desde el backend
-      worksheet.getCell("U12").value = paciente.carrera?.carrera || ''; 
-      worksheet.getCell("F13").value = paciente.derivadoPor || '';
-      
-      if (paciente.psicologo) {
-        worksheet.getCell("K14").value = `${paciente.psicologo.person.primerNombre} ${paciente.psicologo.person.apellidoPaterno}`;
-      }
+      // 2. Datos personales
+      const person = pac.paciente?.person ?? {}
+      const nombreCompleto = [
+        person.primerNombre,
+        person.segundoNombre,
+        person.apellidoPaterno,
+        person.apellidoMaterno,
+      ].filter(Boolean).join(" ")
 
-      // --- MOTIVO DE CONSULTA ---
-      worksheet.getCell("A16").value = antecedentes.motivoConsulta || antecedentes.historiaClinica || '';
-      worksheet.getCell("A16").alignment = { wrapText: true, vertical: 'top', horizontal: 'left' };
+      const psicologo = pac.psicologo
+      const psicologoNombre = psicologo
+        ? `${psicologo.person?.primerNombre ?? ""} ${psicologo.person?.apellidoPaterno ?? ""}`.trim()
+        : ""
 
-      // --- HISTORIA FAMILIAR ---
-      worksheet.getCell("F18").value = antecedentes.conQuienVive || '';
-      worksheet.getCell("AB18").value = paciente.celular || ''; // Celular paciente
-      worksheet.getCell("H19").value = antecedentes.personaReferencia || '';
-      worksheet.getCell("AB19").value = antecedentes.celularReferencia || '';
+      // 3. Fetchear todas las sesiones individualmente (la lista no incluye entrevista ni historialClinico)
+      const sesionesCompletas: any[] = await Promise.all(
+        sesiones.map((s: any) => sesionService.obtenerPorId(s.id))
+      )
 
-      // Padre
-      worksheet.getCell("G21").value = antecedentes.nombrePadre || '';
-      worksheet.getCell("I22").value = antecedentes.ocupacionPadre || '';
-      worksheet.getCell("J23").value = antecedentes.enfermedadPadre || '';
-      worksheet.getCell("J24").value = antecedentes.relacionPadre || '';
+      // Ordenar por fecha ascendente — la primera tiene la entrevista
+      sesionesCompletas.sort(
+        (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+      )
 
-      // Madre
-      worksheet.getCell("H25").value = antecedentes.nombreMadre || '';
-      worksheet.getCell("I26").value = antecedentes.ocupacionMadre || '';
-      worksheet.getCell("J27").value = antecedentes.enfermedadMadre || '';
-      worksheet.getCell("J28").value = antecedentes.relacionMadre || '';
+      const primeraEntrevista: any =
+        sesionesCompletas.find((s) => s.entrevista)?.entrevista ?? null
 
-      // Hermanos
-      worksheet.getCell("H30").value = antecedentes.numeroHermanos || '';
-      worksheet.getCell("W30").value = antecedentes.relatoHermanos || '';
-      worksheet.getCell("W30").alignment = { wrapText: true, vertical: 'top', horizontal: 'left' };
+      const familia     = parse(primeraEntrevista?.historiaFamiliar)
+      const universidad = parse(primeraEntrevista?.relatoUniversidad)
+      const habitos     = parse(primeraEntrevista?.habitos)
+      const acuerdos    = parse(primeraEntrevista?.acuerdos)
+      const sintomasRaw = parse(primeraEntrevista?.sintomas)
 
-      // --- UNIVERSIDAD Y HÁBITOS ---
-      worksheet.getCell("A48").value = antecedentes.relatoUniversidad || '';
-      worksheet.getCell("A48").alignment = { wrapText: true, vertical: 'top', horizontal: 'left' };
+      const padre    = (familia.padre    ?? {}) as Record<string, any>
+      const madre    = (familia.madre    ?? {}) as Record<string, any>
+      const hermanos = (familia.hermanos ?? {}) as Record<string, any>
+      const alcohol  = (habitos.alcohol  ?? {}) as Record<string, any>
+      const tabaco   = (habitos.tabaco   ?? {}) as Record<string, any>
+      const drogas   = (habitos.drogas   ?? {}) as Record<string, any>
 
-      worksheet.getCell("H50").value = antecedentes.consumoAlcohol || '';
-      worksheet.getCell("H51").value = antecedentes.consumoTabaco || '';
-      worksheet.getCell("H52").value = antecedentes.consumoDrogas || '';
-      worksheet.getCell("Q51").value = antecedentes.relatoAcusacionDetencion || '';
-      worksheet.getCell("Q51").alignment = { wrapText: true, vertical: 'top', horizontal: 'left' };
+      const estres    = (sintomasRaw.estres    as number[]) ?? Array(12).fill(0)
+      const ansiedad  = (sintomasRaw.ansiedad  as number[]) ?? Array(12).fill(0)
+      const depresion = (sintomasRaw.depresion as number[]) ?? Array(12).fill(0)
 
-      // --- ACUERDOS ---
-      worksheet.getCell("A71").value = antecedentes.acuerdosEstablecidos || '';
-      if (antecedentes.proximaSesionFecha) {
-        worksheet.getCell("J72").value = new Date(antecedentes.proximaSesionFecha).toLocaleDateString('es-ES');
-      }
-      worksheet.getCell("W72").value = antecedentes.proximaSesionHora || '';
-
-      // --- HISTORIAL CLÍNICO (BUCLE DINÁMICO) ---
-      let filaActual = 74;
-      
-      if (sesiones && sesiones.length > 0) {
-        sesiones.forEach((sesion: any, index: number) => {
-          // 1. Cabecera de la sesión
-          worksheet.getCell(`E${filaActual}`).value = index + 1; // Número de Sesión
-          worksheet.getCell(`E${filaActual}`).font = { bold: true };
-          
-          worksheet.getCell(`AA${filaActual}`).value = new Date(sesion.fechaCreacion || sesion.fecha).toLocaleDateString('es-ES');
-          worksheet.getCell(`AA${filaActual}`).font = { bold: true };
-
-          // 2. Bajamos una fila para escribir la evolución clínica
-          filaActual++;
-          worksheet.getCell(`A${filaActual}`).value = sesion.evolucion || sesion.observaciones || sesion.descripcion || '';
-          worksheet.getCell(`A${filaActual}`).alignment = { wrapText: true, vertical: 'top', horizontal: 'left' };
-          
-          // 3. Deshacemos merges existentes en el rango y combinamos las celdas
-          const mergeRange = `A${filaActual}:AI${filaActual + 2}`;
-          // @ts-ignore - unMergeCells no siempre está tipado pero existe en exceljs
-          try { worksheet.unMergeCells(mergeRange); } catch (_) { /* no estaba mergeado */ }
-          worksheet.mergeCells(mergeRange);
-          
-          // 4. Preparamos la filaActual para la siguiente iteración
-          filaActual += 4; 
-        });
+      // 4. Tags individuales para la tabla de sintomas (12 celdas por columna)
+      const sintomasFlat: Record<string, string | number> = {}
+      for (let i = 0; i < 12; i++) {
+        sintomasFlat[`estres_${i + 1}`]    = estres[i]    ?? ""
+        sintomasFlat[`ansiedad_${i + 1}`]  = ansiedad[i]  ?? ""
+        sintomasFlat[`depresion_${i + 1}`] = depresion[i] ?? ""
       }
 
-      // 3. Generar y descargar el archivo
-      const outBuffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([outBuffer], { 
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
-      });
-      
-      saveAs(blob, `Historial_${nombreCompleto.replace(/ /g, '_')}.xlsx`);
+      // 5. Historial clínico (todas las sesiones con historialClinico)
+      const sesionesConHistorial = sesionesCompletas
+        .filter((s) => s.historialClinico)
+        .sort((a, b) => (a.historialClinico?.nroSesion ?? 0) - (b.historialClinico?.nroSesion ?? 0))
+        .map((s) => {
+          const h = s.historialClinico
+          const tipologias = Array.isArray(h.tipologia)
+            ? h.tipologia.join(", ")
+            : (() => { try { return JSON.parse(h.tipologia ?? "[]").join(", ") } catch { return h.tipologia ?? "" } })()
+          return {
+            nro_sesion:   h.nroSesion ?? "",
+            fecha_sesion: formatFecha(s.fecha),
+            duracion:     s.duracionMinutos ? `${s.duracionMinutos} min` : "",
+            tipologia:    tipologias,
+            gravedad:     h.gravedad ?? "",
+            historia:     limpiar(h.historia),
+          }
+        })
+
+      // 6. Cargar la plantilla
+      const response = await fetch("/plantilla_entrevista.docx")
+      if (!response.ok) throw new Error("No se pudo cargar la plantilla")
+      const arrayBuffer = await response.arrayBuffer()
+
+      // 7. Inicializar docxtemplater
+      const zip = new PizZip(arrayBuffer)
+      const doc = new Docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+      })
+
+      // 8. Inyectar todos los datos
+      doc.render({
+        // Datos personales
+        nombre_completo:  nombreCompleto,
+        edad:             pac.paciente?.edad ?? "",
+        genero:           pac.paciente?.genero != null ? GENERO_MAP[pac.paciente.genero] : "",
+        domicilio:        pac.paciente?.domicilio ?? "",
+        fecha_nacimiento: formatFecha(pac.paciente?.fechaNacimiento),
+        estado_civil:     pac.paciente?.estadoCivil != null ? ESTADO_CIVIL_MAP[pac.paciente.estadoCivil] : "",
+        celular:          person.celular ?? "",
+        semestre:         pac.semestre ?? "",
+        carrera:          carreraStr,
+        remitido_por:     pac.derivadoPor ?? "",
+        psicologo_nombre: psicologoNombre,
+
+        // Motivo de consulta
+        motivo_consulta: limpiar(primeraEntrevista?.antecedentes),
+
+        // Historia familiar
+        con_quien_vive:      limpiar(familia.conQuienVive),
+        persona_referencia:  limpiar(familia.personaReferencia),
+        celular_referencia:  limpiar(familia.celularReferencia),
+        padre_nombre:        limpiar(padre.nombre),
+        padre_edad:          limpiar(padre.edad),
+        padre_ocupacion:     limpiar(padre.ocupacion),
+        padre_enfermedad:    limpiar(padre.enfermedad),
+        padre_relacion:      limpiar(padre.relacion),
+        madre_nombre:        limpiar(madre.nombre),
+        madre_edad:          limpiar(madre.edad),
+        madre_ocupacion:     limpiar(madre.ocupacion),
+        madre_enfermedad:    limpiar(madre.enfermedad),
+        madre_relacion:      limpiar(madre.relacion),
+        numero_hermanos:     limpiar(hermanos.numero),
+        relacion_hermanos:   limpiar(hermanos.relato),
+
+        // Sintomatologías (etiquetas individuales por celda)
+        ...sintomasFlat,
+        total_estres:    primeraEntrevista?.totalScoreEstres    ?? "",
+        total_ansiedad:  primeraEntrevista?.totalScoreAnsiedad  ?? "",
+        total_depresion: primeraEntrevista?.totalScoreDepresion ?? "",
+
+        // Relato universidad
+        relato_universidad: limpiar(universidad.relatoGeneral),
+        cambio_carreras:    limpiar(universidad.cambioCarreras),
+        motivos_cambio:     limpiar(universidad.motivosCambio),
+
+        // Hábitos
+        consumo_alcohol:  alcohol.frecuencia ?? "",
+        consumo_tabaco:   tabaco.frecuencia ?? "",
+        consumo_drogas:   drogas.frecuencia ?? "",
+        relato_acusacion: limpiar(habitos.relatoAcusacionDetencion),
+
+        // Acuerdos
+        acuerdos:              limpiar(acuerdos.acuerdosEstablecidos),
+        proxima_sesion_fecha:  limpiar(acuerdos.proximaSesionFecha),
+        proxima_sesion_hora:   limpiar(acuerdos.proximaSesionHora),
+
+        // Historial clínico (loop)
+        sesiones: sesionesConHistorial,
+      })
+
+      // 9. Descargar
+      const blob = doc.getZip().generate({
+        type: "blob",
+        mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      })
+
+      saveAs(blob, `Entrevista_${nombreCompleto.replace(/ /g, "_")}.docx`)
 
     } catch (error) {
-      console.error("Error al generar el Excel:", error);
-      alert("Hubo un error al generar el historial.");
+      console.error("Error al generar el informe:", error)
+      alert("Hubo un error al generar el informe.")
     } finally {
-      setGenerando(false);
+      setGenerando(false)
     }
-  };
+  }
 
   return (
-    <Button 
-      onClick={generarExcel} 
+    <Button
+      onClick={generarDocumento}
       disabled={generando}
-      className="bg-green-600 text-white hover:bg-green-700 shadow-sm transition-colors"
+      className="bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-colors"
     >
-      {generando ? (
-        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-      ) : (
-        <FileDown className="h-4 w-4 mr-2" />
-      )}
-      {generando ? "Generando Excel..." : "Descargar Historial Clínico"}
+      {generando
+        ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generando...</>
+        : <><FileDown className="h-4 w-4 mr-2" /> Descargar Historial Clínico</>
+      }
     </Button>
-  );
+  )
 }

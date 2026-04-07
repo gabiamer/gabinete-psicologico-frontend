@@ -28,7 +28,6 @@ const PASOS = [
 const RegistroPaciente: React.FC = () => {
   const navigate = useNavigate();
   const [paso, setPaso] = useState<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8>(1);
-  const [pacienteId, setPacienteId] = useState<number | null>(null);
 
   const [formData, setFormData] = useState<FormData>({
     primerNombre: '',
@@ -40,6 +39,7 @@ const RegistroPaciente: React.FC = () => {
     edad: '',
     domicilio: '',
     estadoCivil: 1,
+    genero: '',
     semestre: 1,
     derivadoPor: '',
     psicologoId: ''
@@ -119,7 +119,7 @@ const RegistroPaciente: React.FC = () => {
     }
     setFormData(prev => ({
       ...prev,
-      [name]: ['estadoCivil', 'semestre', 'edad'].includes(name)
+      [name]: ['estadoCivil', 'genero', 'semestre', 'edad'].includes(name)
         ? value === '' ? '' : parseInt(value)
         : value
     }));
@@ -151,26 +151,12 @@ const RegistroPaciente: React.FC = () => {
     return true;
   };
 
-  const handleSubmitStep1 = async (e: React.FormEvent) => {
+  const handleSubmitStep1 = (e: React.FormEvent) => {
     e.preventDefault();
     setMensaje(''); setError('');
     if (!validateStep1()) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
-    setLoading(true);
-    try {
-      if (pacienteId) {
-        await pacienteService.actualizar(pacienteId, formData);
-        setMensaje('Datos actualizados correctamente');
-      } else {
-        const id = await pacienteService.crear(formData);
-        setPacienteId(id);
-        setMensaje('Ficha básica guardada');
-      }
-      setTimeout(() => { setPaso(2); setMensaje(''); window.scrollTo({ top: 0, behavior: 'smooth' }); }, 1500);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al guardar');
-    } finally {
-      setLoading(false);
-    }
+    setPaso(2);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const avanzar = (e: React.FormEvent, siguiente: 1|2|3|4|5|6|7|8) => {
@@ -186,7 +172,7 @@ const RegistroPaciente: React.FC = () => {
     setSubmitting(true);
     setLoading(true);
     try {
-      await pacienteService.guardarHistoriaClinica(pacienteId!, antecedentes, sintomatologias);
+      const pacienteId = await pacienteService.crearEntrevistaCompleta(formData, antecedentes, sintomatologias);
       setMensaje('¡Entrevista completada exitosamente!');
       setTimeout(() => { navigate(`/pacientes/${pacienteId}/historial`); }, 2000);
     } catch (err: any) {
@@ -239,8 +225,8 @@ const RegistroPaciente: React.FC = () => {
               <button type="button" className="btn-back-dashboard" onClick={() => navigate('/')}>
                 ← Volver al Dashboard
               </button>
-              <button type="submit" disabled={loading} className="btn-submit">
-                {loading ? 'Guardando...' : 'Guardar y Continuar'}
+              <button type="submit" className="btn-submit">
+                Continuar
               </button>
             </div>
           </form>

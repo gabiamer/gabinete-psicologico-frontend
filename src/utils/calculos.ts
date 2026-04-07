@@ -18,14 +18,19 @@ export const calcularTotal = (valores: number[]): number => {
 
 export const interpretarResultado = (total: number, tipo: 'estres' | 'ansiedad' | 'depresion') => {
   if (tipo === 'estres') {
-    if (total <= 10) return { texto: 'Sin estrés', color: '#10b981' };
-    if (total <= 19) return { texto: 'Estrés ligero/menor', color: '#f59e0b' };
-    if (total <= 25) return { texto: 'Estrés moderado', color: '#ef4444' };
-    return { texto: 'Estrés severo', color: '#dc2626' };
+    if (total <= 12) return { texto: 'Sin estrés', color: '#10b981' };
+    if (total <= 21) return { texto: 'Estrés ligera/menor', color: '#f59e0b' };
+    if (total <= 29) return { texto: 'Estrés moderada', color: '#ef4444' };
+    return { texto: 'Estrés severa', color: '#dc2626' };
+  } else if (tipo === 'ansiedad') {
+    if (total <= 12) return { texto: 'Sin ansiedad', color: '#10b981' };
+    if (total <= 21) return { texto: 'Ansiedad ligera/menor', color: '#f59e0b' };
+    if (total <= 29) return { texto: 'Ansiedad moderada', color: '#ef4444' };
+    return { texto: 'Ansiedad muy severa', color: '#dc2626' };
   } else {
-    if (total <= 7) return { texto: `Sin ${tipo}`, color: '#10b981' };
-    if (total <= 13) return { texto: `${tipo.charAt(0).toUpperCase() + tipo.slice(1)} ligera/menor`, color: '#f59e0b' };
-    if (total <= 18) return { texto: `${tipo.charAt(0).toUpperCase() + tipo.slice(1)} moderada`, color: '#ef4444' };
-    return { texto: `${tipo.charAt(0).toUpperCase() + tipo.slice(1)} muy severa`, color: '#dc2626' };
+    if (total <= 12) return { texto: 'Sin depresión', color: '#10b981' };
+    if (total <= 21) return { texto: 'Depresión ligera/menor', color: '#f59e0b' };
+    if (total <= 29) return { texto: 'Depresión moderada', color: '#ef4444' };
+    return { texto: 'Depresión muy severa', color: '#dc2626' };
   }
 };

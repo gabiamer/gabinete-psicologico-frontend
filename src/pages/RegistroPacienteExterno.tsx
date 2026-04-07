@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { FormData } from '../types/types';
-import { pacienteExternoService } from '../services/pacienteExternoService';
 import { calcularEdad } from '../utils/calculos';
 import { FormField } from '../components/shared/FormField';
 import './RegistroPaciente.css';
@@ -20,6 +19,7 @@ const RegistroPacienteExterno: React.FC = () => {
     edad: '',
     domicilio: '',
     estadoCivil: 1,
+    genero: '',
     semestre: 1,
     derivadoPor: '',
     psicologoId: ''
@@ -29,9 +29,7 @@ const RegistroPacienteExterno: React.FC = () => {
   const [anio, setAnio] = useState(1);
   const [correo, setCorreo] = useState('');
 
-  const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -70,9 +68,9 @@ const RegistroPacienteExterno: React.FC = () => {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setMensaje('');
+    // setMensaje('');
     setError('');
 
     if (!validateForm()) {
@@ -80,37 +78,7 @@ const RegistroPacienteExterno: React.FC = () => {
       return;
     }
 
-    setLoading(true);
-
-    try {
-      const payload = {
-        person: {
-          primerNombre: formData.primerNombre,
-          segundoNombre: formData.segundoNombre || null,
-          apellidoPaterno: formData.apellidoPaterno || null,
-          apellidoMaterno: formData.apellidoMaterno || null,
-          celular: formData.celular
-        },
-        fechaNacimiento: formData.fechaNacimiento,
-        edad: formData.edad || null,
-        domicilio: formData.domicilio,
-        estadoCivil: formData.estadoCivil,
-        escuela,
-        anio,
-        correo
-      };
-
-      const id = await pacienteExternoService.crear(payload);
-      setMensaje('Paciente externo registrado exitosamente');
-      
-      setTimeout(() => {
-        navigate(`/pacientes-externos/${id}/orientacion-vocacional`);
-      }, 1500);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al registrar paciente externo');
-    } finally {
-      setLoading(false);
-    }
+    navigate('/nueva-orientacion', { state: { formData, escuela, anio, correo } });
   };
 
   return (
@@ -121,7 +89,6 @@ const RegistroPacienteExterno: React.FC = () => {
           <p>Datos del consultante externo</p>
         </header>
 
-        {mensaje && <div className="alert alert-success">{mensaje}</div>}
         {error && <div className="alert alert-error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="form-content" noValidate>
@@ -282,8 +249,8 @@ const RegistroPacienteExterno: React.FC = () => {
             >
               Cancelar
             </button>
-            <button type="submit" disabled={loading} className="btn-submit">
-              {loading ? 'Registrando...' : 'Continuar a Entrevista →'}
+            <button type="submit" className="btn-submit">
+              Continuar a Entrevista →
             </button>
           </div>
         </form>

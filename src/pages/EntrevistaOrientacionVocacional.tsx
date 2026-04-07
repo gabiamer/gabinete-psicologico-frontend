@@ -1,6 +1,6 @@
 // src/pages/EntrevistaOrientacionVocacional.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import type { FormData, OrientacionVocacionalData } from '../types/types';
 import { orientacionService } from '../services/orientacionService';
 import { calcularEdad } from '../utils/calculos';
@@ -19,23 +19,29 @@ const PASOS = [
 const EntrevistaOrientacionVocacional: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
+    const location = useLocation();
+    const nuevoPacienteState = (location.state as { formData: FormData; escuela: string; anio: number; correo: string } | null);
+    const esNuevoPaciente = !id && !!nuevoPacienteState;
     const [paso, setPaso] = useState<1 | 2 | 3>(1);
     const [, setPacienteCargado] = useState(false);
 
-    const [formData, setFormData] = useState<FormData>({
-        primerNombre: '',
-        segundoNombre: '',
-        apellidoPaterno: '',
-        apellidoMaterno: '',
-        celular: '',
-        fechaNacimiento: '',
-        edad: '',
-        domicilio: '',
-        estadoCivil: 1,
-        semestre: 1,
-        derivadoPor: '',
-        psicologoId: ''
-    });
+    const [formData, setFormData] = useState<FormData>(
+        nuevoPacienteState?.formData ?? {
+            primerNombre: '',
+            segundoNombre: '',
+            apellidoPaterno: '',
+            apellidoMaterno: '',
+            celular: '',
+            fechaNacimiento: '',
+            edad: '',
+            domicilio: '',
+            estadoCivil: 1,
+            genero: '',
+            semestre: 1,
+            derivadoPor: '',
+            psicologoId: ''
+        }
+    );
 
     const [orientacion, setOrientacion] = useState<OrientacionVocacionalData>({
         motivoConsulta: '',
@@ -216,11 +222,19 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
         }
 
         try {
-            await orientacionService.guardarEntrevista(Number(id), orientacion);
+            if (esNuevoPaciente) {
+                await orientacionService.crearCompleta(
+                    formData,
+                    nuevoPacienteState!.escuela,
+                    nuevoPacienteState!.anio,
+                    nuevoPacienteState!.correo,
+                    orientacion
+                );
+            } else {
+                await orientacionService.guardarEntrevista(Number(id), orientacion);
+            }
             setMensaje('¡Entrevista de orientación vocacional guardada exitosamente!');
-            setTimeout(() => {
-                navigate('/');
-            }, 2000);
+            setTimeout(() => navigate('/informe'), 2000);
         } catch (err: any) {
             setError('Error al guardar la entrevista');
             setSubmitting(false);

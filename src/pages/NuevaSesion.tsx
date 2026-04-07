@@ -1,5 +1,5 @@
 // src/pages/NuevaSesion.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { pacienteService } from '../services/pacienteService';
 import { sesionService } from '../services/sesionService';
@@ -7,6 +7,17 @@ import { FormField } from '../components/shared/FormField';
 import './RegistroPaciente.css';
 
 const TIPOLOGIAS = ['Estrés', 'Baja autoestima', 'Ansiedad', 'Depresión', 'Problemas familiares', 'Problemas académicos'];
+
+/** Hora actual en zona horaria de Bolivia (UTC-4) en formato HH:mm:ss */
+function horaBolivia(): string {
+  return new Date().toLocaleTimeString('es-BO', {
+    timeZone: 'America/La_Paz',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+}
 
 const NuevaSesion: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +32,25 @@ const NuevaSesion: React.FC = () => {
   const [notas, setNotas] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Temporizador
+  const horaInicioRef = useRef<string>(horaBolivia());
+  const inicioTimestamp = useRef<number>(Date.now());
+  const [elapsed, setElapsed] = useState(0); // segundos
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - inicioTimestamp.current) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatElapsed = (seg: number) => {
+    const h = Math.floor(seg / 3600).toString().padStart(2, '0');
+    const m = Math.floor((seg % 3600) / 60).toString().padStart(2, '0');
+    const s = (seg % 60).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  };
 
   useEffect(() => {
     cargarPaciente();
@@ -58,15 +88,19 @@ const NuevaSesion: React.FC = () => {
     setLoading(true);
     setError('');
 
+    const horaFin = horaBolivia();
+
     try {
       const sesionData = {
         fecha: `${fecha}T${hora}:00`,
+        horaInicio: horaInicioRef.current,
+        horaFin,
         historialClinico: {
           nroSesion: numeroSesion,
           historia: notas,
           gravedad: gravedad,
-          tipologias: tipologias
-        }
+          tipologias: tipologias,
+        },
       };
 
       await sesionService.crear(Number(id), sesionData);
@@ -91,11 +125,52 @@ const NuevaSesion: React.FC = () => {
 
   return (
     <div className="registro-wrapper">
+      {/* Temporizador decorativo — fuera del card, encima del header */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom: '12px',
+      }}>
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '10px',
+          backgroundColor: '#0f172a',
+          color: '#e2e8f0',
+          borderRadius: '999px',
+          padding: '8px 20px',
+          fontSize: '15px',
+          fontFamily: 'monospace',
+          letterSpacing: '0.05em',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
+        }}>
+          <span style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: '#22c55e',
+            display: 'inline-block',
+            animation: 'pulse 1.5s ease-in-out infinite',
+          }} />
+          Sesión en curso — {formatElapsed(elapsed)}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+      `}</style>
+
       <div className="card-academic">
         <header className="banner-header">
           <h1>Nueva Sesión</h1>
           <p>
-            {paciente.paciente?.person?.primerNombre} {paciente.paciente?.person?.apellidoPaterno} - Sesión #{numeroSesion}
+            {paciente.paciente?.person?.primerNombre} {paciente.paciente?.person?.apellidoPaterno} — Sesión #{numeroSesion}
+          </p>
+          <p style={{ fontSize: '12px', opacity: 0.7, marginTop: '4px' }}>
+            Inicio: {horaInicioRef.current}
           </p>
         </header>
 
@@ -133,7 +208,7 @@ const NuevaSesion: React.FC = () => {
                 />
               </FormField>
 
-              <FormField label="Hora" required>
+              <FormField label="Hora (referencia)">
                 <input
                   type="time"
                   value={hora}

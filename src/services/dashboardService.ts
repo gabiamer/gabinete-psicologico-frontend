@@ -11,6 +11,9 @@ export interface EntrevistaRow {
   numeroSesiones: number;
   ultimaSesionFecha: string | null;
   gravedad: string;
+  descripcion: string | null;
+  principalProblematica: string | null;
+  situacionCaso: string;
 }
 
 export interface OrientacionRow {
@@ -35,6 +38,13 @@ export interface DashboardStats {
     moderado: number;
     grave: number;
   };
+  situacionDistribucion: {
+    "Acompañamiento psicológico": number;
+    "Buen proceso": number;
+    "Proceso terminado": number;
+    "Orientación vocacional": number;
+    "Derivado a consultorio externo": number;
+  };
 }
 
 export const dashboardService = {
@@ -51,5 +61,25 @@ export const dashboardService = {
   obtenerEstadisticas: async (): Promise<DashboardStats> => {
     const response = await api.get('/dashboard/stats');
     return response.data.data;
+  },
+
+  actualizarSituacion: async (id: number, situacionCaso: string): Promise<void> => {
+    await api.patch(`/pacientes/universitario/${id}/situacion`, { situacionCaso });
+  },
+
+  generarResumen: async (id: number): Promise<{ descripcion: string; principalProblematica: string }> => {
+    const response = await api.post(`/pacientes/universitario/${id}/generar-resumen`);
+    return {
+      descripcion: response.data.descripcion,
+      principalProblematica: response.data.principalProblematica,
+    };
+  },
+
+  eliminarEntrevista: async (id: number): Promise<void> => {
+    await api.delete(`/pacientes/universitario/${id}`);
+  },
+
+  eliminarOrientacion: async (id: number): Promise<void> => {
+    await api.delete(`/pacientes-externos/${id}`);
   },
 };

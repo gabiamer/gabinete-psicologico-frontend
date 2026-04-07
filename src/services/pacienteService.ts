@@ -57,6 +57,7 @@ export const pacienteService = {
       edad: formData.edad || null,
       domicilio: formData.domicilio,
       estadoCivil: formData.estadoCivil,
+      genero: formData.genero || null,
       semestre: formData.semestre,
       derivadoPor: formData.derivadoPor,
       psicologoId: formData.psicologoId,
@@ -81,6 +82,7 @@ export const pacienteService = {
       edad: formData.edad || null,
       domicilio: formData.domicilio,
       estadoCivil: formData.estadoCivil,
+      genero: formData.genero || null,
       semestre: formData.semestre,
       derivadoPor: formData.derivadoPor,
       psicologoId: formData.psicologoId,
@@ -115,5 +117,41 @@ export const pacienteService = {
   obtenerPorId: async (id: number) => {
     const response = await api.get(`/pacientes/${id}`);
     return response.data.data || response.data;
-  }
+  },
+
+  /** Crea paciente universitario + entrevista psicológica en una sola llamada */
+  crearEntrevistaCompleta: async (
+    formData: FormData,
+    antecedentes: AntecedentesData,
+    sintomatologias: { estres: number[]; ansiedad: number[]; depresion: number[] }
+  ): Promise<number> => {
+    const payload = {
+      // Datos del paciente
+      person: {
+        primerNombre: formData.primerNombre,
+        segundoNombre: formData.segundoNombre || null,
+        apellidoPaterno: formData.apellidoPaterno || null,
+        apellidoMaterno: formData.apellidoMaterno || null,
+        celular: formData.celular,
+      },
+      fechaNacimiento: formData.fechaNacimiento,
+      edad: formData.edad || null,
+      domicilio: formData.domicilio,
+      estadoCivil: formData.estadoCivil,
+      genero: formData.genero || null,
+      semestre: formData.semestre,
+      derivadoPor: formData.derivadoPor,
+      psicologoId: formData.psicologoId,
+      carreraId: formData.carreraId,
+      // Datos de la entrevista
+      ...antecedentes,
+      sintomas: sintomatologias,
+      totalScoreEstres: sintomatologias.estres.reduce((a, b) => a + b, 0),
+      totalScoreAnsiedad: sintomatologias.ansiedad.reduce((a, b) => a + b, 0),
+      totalScoreDepresion: sintomatologias.depresion.reduce((a, b) => a + b, 0),
+    };
+
+    const response = await api.post('/pacientes/entrevista-completa', payload);
+    return response.data.pacienteId;
+  },
 };
