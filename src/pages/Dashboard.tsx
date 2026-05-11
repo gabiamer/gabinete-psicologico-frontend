@@ -1,40 +1,38 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import { FileText, UserPlus, PlayCircle, Settings, ClipboardList } from "lucide-react"
+import { format, startOfYear, endOfYear } from "date-fns"
+import { FileText, UserPlus, PlayCircle, Settings, ClipboardList, LogOut } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 import AccionCard from "@/components/dashboard/AccionCard"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { SelectorRango } from "@/components/dashboard/SelectorRango"
+import { BotonExportarGraficasPDF } from "@/components/dashboard/BotonExportarGraficasPDF"
 import {
   reportesService,
-  type HorasTurnoRow,
-  type HorasGeneroRow,
-  type HorasDepartamentoRow,
+  type RangoParams,
   type CasoGravedadRow,
+  type CasoSituacionRow,
   type TipologiaGeneroRow,
   type ParticipanteCarreraRow,
-  type HorasEjecutadasVsDesignadasRow,
+  type HorasDepartamentoRow,
   type SesionesPorMesRow,
   type SesionesPorPsicologoRow,
+  type SesionesPorTurnoRow,
+  type PacientesPorPsicologoRow,
   type ScorePromedioRow,
   type SemestreRow,
   type NuevosPacientesPorMesRow,
   type DistribucionGeneroRow,
   type DistribucionEdadRow,
 } from "@/services/reportesService"
-import { GraficaHorasTurno } from "@/components/dashboard/ui/GraficaHorasTurno"
-import { GraficaHorasGenero } from "@/components/dashboard/ui/GraficaHorasGenero"
+import { GraficaSesionesPorTurno } from "@/components/dashboard/ui/GraficaSesionesPorTurno"
+import { GraficaPacientesPorPsicologo } from "@/components/dashboard/ui/GraficaPacientesPorPsicologo"
 import { GraficaHorasDepartamento } from "@/components/dashboard/ui/GraficaHorasDepartamento"
 import { GraficaGravedad } from "@/components/dashboard/ui/GraficaGravedad"
+import { GraficaSituacionCaso } from "@/components/dashboard/ui/GraficaSituacionCaso"
 import { GraficaTipologias } from "@/components/dashboard/ui/GraficaTipologias"
 import { GraficaParticipantesCarrera } from "@/components/dashboard/ui/GraficaParticipantesCarrera"
-import { GraficaHorasEjecutadasVsDesignadas } from "@/components/dashboard/ui/GraficaHorasEjecutadasVsDesignadas"
 import { GraficaSesionesPorMes } from "@/components/dashboard/ui/GraficaSesionesPorMes"
 import { GraficaSesionesPorPsicologo } from "@/components/dashboard/ui/GraficaSesionesPorPsicologo"
 import { GraficaScorePromedio } from "@/components/dashboard/ui/GraficaScorePromedio"
@@ -43,21 +41,30 @@ import { GraficaNuevosPacientesPorMes } from "@/components/dashboard/ui/GraficaN
 import { GraficaDistribucionGenero } from "@/components/dashboard/ui/GraficaDistribucionGenero"
 import { GraficaDistribucionEdad } from "@/components/dashboard/ui/GraficaDistribucionEdad"
 
+function rangoAnioActual(): RangoParams {
+  const hoy = new Date()
+  return {
+    desde: format(startOfYear(hoy), "yyyy-MM-dd"),
+    hasta: format(endOfYear(hoy), "yyyy-MM-dd"),
+  }
+}
+
 export default function Dashboard() {
   const navigate = useNavigate()
-  const [anio, setAnio] = useState<number>(new Date().getFullYear())
+  const { user, isAdmin, logout } = useAuth()
+  const [rango, setRango] = useState<RangoParams>(rangoAnioActual())
   const [loading, setLoading] = useState(true)
 
   // Uso del AP
-  const [horasTurno, setHorasTurno] = useState<HorasTurnoRow[]>([])
-  const [horasGenero, setHorasGenero] = useState<HorasGeneroRow[]>([])
-  const [horasDepartamento, setHorasDepartamento] = useState<HorasDepartamentoRow[]>([])
-  const [horasEjecutadasVsDesignadas, setHorasEjecutadasVsDesignadas] = useState<HorasEjecutadasVsDesignadasRow[]>([])
   const [sesionesPorMes, setSesionesPorMes] = useState<SesionesPorMesRow[]>([])
   const [sesionesPorPsicologo, setSesionesPorPsicologo] = useState<SesionesPorPsicologoRow[]>([])
+  const [sesionesPorTurno, setSesionesPorTurno] = useState<SesionesPorTurnoRow[]>([])
+  const [pacientesPorPsicologo, setPacientesPorPsicologo] = useState<PacientesPorPsicologoRow[]>([])
+  const [sesionesDepartamento, setSesionesDepartamento] = useState<HorasDepartamentoRow[]>([])
 
   // Casos Clínicos
   const [gravedad, setGravedad] = useState<CasoGravedadRow[]>([])
+  const [situacionCaso, setSituacionCaso] = useState<CasoSituacionRow[]>([])
   const [tipologias, setTipologias] = useState<TipologiaGeneroRow[]>([])
   const [scorePromedio, setScorePromedio] = useState<ScorePromedioRow[]>([])
 
@@ -68,41 +75,44 @@ export default function Dashboard() {
   const [distribucionGenero, setDistribucionGenero] = useState<DistribucionGeneroRow[]>([])
   const [distribucionEdad, setDistribucionEdad] = useState<DistribucionEdadRow[]>([])
 
+  // Memoize rango string to avoid re-fetching on object identity changes with same values
+  const rangoKey = useMemo(() => `${rango.desde}|${rango.hasta}`, [rango])
+
   useEffect(() => {
     let cancelled = false
 
     async function fetchAll() {
       setLoading(true)
       const [
-        turno, genero, departamento, ejVsDesig, sesMes, sesPsi,
-        grav, tipol, scores,
+        sesMes, sesPsi, sesTurno, pacPsi, sesDep,
+        grav, sit, tipol, scores,
         carrera, sem, nuevosPac, distGenero, distEdad,
       ] = await Promise.all([
-        reportesService.horasPorTurno(anio),
-        reportesService.horasPorGenero(anio),
-        reportesService.horasPorDepartamento(anio),
-        reportesService.horasEjecutadasVsDesignadas(anio),
-        reportesService.sesionesPorMes(anio),
-        reportesService.sesionesPorPsicologo(anio),
-        reportesService.casosPorGravedad(),
-        reportesService.tipologiasPorGenero(),
-        reportesService.scorePromedio(anio),
+        reportesService.sesionesPorMes(rango),
+        reportesService.sesionesPorPsicologo(rango),
+        reportesService.sesionesPorTurno(rango),
+        reportesService.pacientesPorPsicologo(),
+        reportesService.horasPorDepartamento(rango),
+        reportesService.casosPorGravedad(rango),
+        reportesService.casosPorSituacion(),
+        reportesService.tipologiasPorGenero(rango),
+        reportesService.scorePromedio(rango),
         reportesService.participantesPorCarrera(),
         reportesService.semestres(),
-        reportesService.nuevosPacientesPorMes(anio),
+        reportesService.nuevosPacientesPorMes(rango),
         reportesService.distribucionGenero(),
         reportesService.distribucionEdad(),
       ])
 
       if (cancelled) return
 
-      setHorasTurno(turno)
-      setHorasGenero(genero)
-      setHorasDepartamento(departamento)
-      setHorasEjecutadasVsDesignadas(ejVsDesig)
       setSesionesPorMes(sesMes)
       setSesionesPorPsicologo(sesPsi)
+      setSesionesPorTurno(sesTurno)
+      setPacientesPorPsicologo(pacPsi)
+      setSesionesDepartamento(sesDep)
       setGravedad(grav)
+      setSituacionCaso(sit)
       setTipologias(tipol)
       setScorePromedio(scores)
       setParticipantesCarrera(carrera)
@@ -115,18 +125,32 @@ export default function Dashboard() {
 
     fetchAll()
     return () => { cancelled = true }
-  }, [anio])
+  }, [rangoKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Top bar con branding */}
-      <header className="bg-[#0f172a] text-white px-8 py-4 flex-shrink-0">
-        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-          UCB Tarija
-        </p>
-        <h1 className="text-lg font-extrabold uppercase tracking-tight">
-          Gabinete Psicologico
-        </h1>
+      <header className="bg-[#0f172a] text-white px-8 py-4 flex-shrink-0 flex items-center justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+            UCB Tarija
+          </p>
+          <h1 className="text-lg font-extrabold uppercase tracking-tight">
+            Gabinete Psicologico
+          </h1>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-slate-300">
+            {user?.psicologoNombre || user?.username}
+          </span>
+          <button
+            onClick={() => { logout(); navigate('/login'); }}
+            className="flex items-center gap-1 text-sm text-slate-400 hover:text-white transition-colors"
+          >
+            <LogOut className="h-4 w-4" />
+            Salir
+          </button>
+        </div>
       </header>
 
       <div className="flex-1 flex flex-col items-center px-8 py-10">
@@ -139,7 +163,7 @@ export default function Dashboard() {
           </p>
 
           {/* AccionCards */}
-          <div className="grid grid-cols-5 gap-6">
+          <div className={`grid gap-6 ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
             <AccionCard
               icon={FileText}
               title="Ver Informe"
@@ -168,42 +192,42 @@ export default function Dashboard() {
               onClick={() => navigate("/actividades")}
               colorScheme="teal"
             />
-            <AccionCard
-              icon={Settings}
-              title="Configuracion"
-              description="Administra psicologos, carreras y horas designadas"
-              onClick={() => navigate("/configuracion")}
-              colorScheme="slate"
-            />
+            {isAdmin && (
+              <AccionCard
+                icon={Settings}
+                title="Configuracion"
+                description="Administra psicologos, carreras y horas designadas"
+                onClick={() => navigate("/configuracion")}
+                colorScheme="slate"
+              />
+            )}
           </div>
 
           {/* Statistics section */}
           <div className="mt-10">
-            <Tabs defaultValue="uso">
-              <div className="flex items-center justify-between mb-4">
+            <Tabs defaultValue={isAdmin ? "uso" : "casos"}>
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                 <TabsList>
-                  <TabsTrigger value="uso">Uso del AP</TabsTrigger>
+                  {isAdmin && <TabsTrigger value="uso">Uso del AP</TabsTrigger>}
                   <TabsTrigger value="casos">Casos Clínicos</TabsTrigger>
                   <TabsTrigger value="participantes">Participantes</TabsTrigger>
                 </TabsList>
 
-                {/* Year selector */}
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold text-slate-700">Año:</span>
-                  <Select
-                    value={String(anio)}
-                    onValueChange={(val) => setAnio(Number(val))}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="2023">2023</SelectItem>
-                      <SelectItem value="2024">2024</SelectItem>
-                      <SelectItem value="2025">2025</SelectItem>
-                      <SelectItem value="2026">2026</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <SelectorRango value={rango} onChange={setRango} />
+                  {!loading && (
+                    <BotonExportarGraficasPDF
+                      graficaIds={
+                        isAdmin
+                          ? ["g-ses-mes","g-ses-turno","g-pac-psi","g-ses-psi","g-dep",
+                             "g-score","g-gravedad","g-tipologias","g-situacion",
+                             "g-nuevos-pac","g-dist-genero","g-dist-edad","g-semestres","g-carrera"]
+                          : ["g-score","g-gravedad","g-tipologias","g-situacion",
+                             "g-nuevos-pac","g-dist-genero","g-dist-edad","g-semestres","g-carrera"]
+                      }
+                      nombreArchivo="graficas-gabinete.pdf"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -221,39 +245,39 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <>
-                  {/* ── Tab: Uso del AP ─────────────────────────────── */}
+                  {/* ── Tab: Uso del AP (solo ADMIN) ────────────────── */}
                   <TabsContent value="uso" className="flex flex-col gap-6">
-                    <GraficaHorasEjecutadasVsDesignadas data={horasEjecutadasVsDesignadas} />
-                    {/* <GraficaHorasTurno data={horasTurno} /> */}
                     <div className="grid grid-cols-2 gap-6">
-                      <GraficaSesionesPorMes data={sesionesPorMes} />
-                      <GraficaSesionesPorPsicologo data={sesionesPorPsicologo} />
+                      <div id="g-ses-mes"><GraficaSesionesPorMes data={sesionesPorMes} /></div>
+                      <div id="g-ses-turno"><GraficaSesionesPorTurno data={sesionesPorTurno} /></div>
                     </div>
                     <div className="grid grid-cols-2 gap-6">
-                      <GraficaHorasGenero data={horasGenero} />
-                      <GraficaHorasDepartamento data={horasDepartamento} />
+                      <div id="g-pac-psi"><GraficaPacientesPorPsicologo data={pacientesPorPsicologo} /></div>
+                      <div id="g-ses-psi"><GraficaSesionesPorPsicologo data={sesionesPorPsicologo} /></div>
                     </div>
+                    <div id="g-dep"><GraficaHorasDepartamento data={sesionesDepartamento} /></div>
                   </TabsContent>
 
                   {/* ── Tab: Casos Clínicos ─────────────────────────── */}
                   <TabsContent value="casos" className="flex flex-col gap-6">
-                    <GraficaScorePromedio data={scorePromedio} />
+                    <div id="g-score"><GraficaScorePromedio data={scorePromedio} /></div>
                     <div className="grid grid-cols-2 gap-6">
-                      <GraficaGravedad data={gravedad} />
-                      <GraficaTipologias data={tipologias} />
+                      <div id="g-gravedad"><GraficaGravedad data={gravedad} /></div>
+                      <div id="g-tipologias"><GraficaTipologias data={tipologias} /></div>
                     </div>
+                    <div id="g-situacion"><GraficaSituacionCaso data={situacionCaso} /></div>
                   </TabsContent>
 
                   {/* ── Tab: Participantes ──────────────────────────── */}
                   <TabsContent value="participantes" className="flex flex-col gap-6">
-                    <GraficaNuevosPacientesPorMes data={nuevosPacientesPorMes} />
+                    <div id="g-nuevos-pac"><GraficaNuevosPacientesPorMes data={nuevosPacientesPorMes} /></div>
                     <div className="grid grid-cols-2 gap-6">
-                      <GraficaDistribucionGenero data={distribucionGenero} />
-                      <GraficaDistribucionEdad data={distribucionEdad} />
+                      <div id="g-dist-genero"><GraficaDistribucionGenero data={distribucionGenero} /></div>
+                      <div id="g-dist-edad"><GraficaDistribucionEdad data={distribucionEdad} /></div>
                     </div>
                     <div className="grid grid-cols-2 gap-6">
-                      <GraficaSemestres data={semestres} />
-                      <GraficaParticipantesCarrera data={participantesCarrera} />
+                      <div id="g-semestres"><GraficaSemestres data={semestres} /></div>
+                      <div id="g-carrera"><GraficaParticipantesCarrera data={participantesCarrera} /></div>
                     </div>
                   </TabsContent>
                 </>

@@ -1,6 +1,22 @@
 import api from './api'
 import type { Psicologo, Carrera } from '@/types/types'
 
+export interface UsuarioRow {
+  id: number
+  username: string
+  rol: 'ADMIN' | 'PSICOLOGO'
+  activo: boolean
+  psicologoId: number | null
+  psicologoNombre: string | null
+}
+
+export interface UsuarioInput {
+  username: string
+  password: string
+  rol: 'ADMIN' | 'PSICOLOGO'
+  psicologoId: number | null
+}
+
 export interface PsicologoInput {
   primerNombre: string
   segundoNombre?: string
@@ -61,6 +77,30 @@ export const adminService = {
     },
     delete: async (id: number): Promise<void> => {
       await api.delete(`/carreras/${id}`)
+    },
+  },
+
+  usuarios: {
+    getAll: async (): Promise<UsuarioRow[]> => {
+      const res = await api.get('/usuarios')
+      return res.data.data
+    },
+    create: async (data: UsuarioInput): Promise<UsuarioRow> => {
+      const res = await api.post('/usuarios', data)
+      if (!res.data.success) throw new Error(res.data.message)
+      return res.data.data
+    },
+    update: async (id: number, data: { username?: string; password?: string; psicologoId?: number | null }): Promise<UsuarioRow> => {
+      const res = await api.put(`/usuarios/${id}`, data)
+      if (!res.data.success) throw new Error(res.data.message)
+      return res.data.data
+    },
+    toggleActivo: async (id: number, activo: boolean): Promise<UsuarioRow> => {
+      const res = await api.put(`/usuarios/${id}`, { activo })
+      return res.data.data
+    },
+    delete: async (id: number): Promise<void> => {
+      await api.delete(`/usuarios/${id}`)
     },
   },
 

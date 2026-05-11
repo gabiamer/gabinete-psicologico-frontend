@@ -97,17 +97,17 @@ export default function DetalleActividad() {
 
             <div>
               <h3 className="text-sm font-semibold text-slate-600 mb-1">Objetivo</h3>
-              <p className="text-slate-800 text-sm whitespace-pre-wrap">{actividad.objetivo}</p>
+              <p className="text-slate-800 text-sm whitespace-pre-wrap break-words">{actividad.objetivo}</p>
             </div>
 
             <div>
               <h3 className="text-sm font-semibold text-slate-600 mb-1">Resumen</h3>
-              <p className="text-slate-800 text-sm whitespace-pre-wrap">{actividad.resumen}</p>
+              <p className="text-slate-800 text-sm whitespace-pre-wrap break-words">{actividad.resumen}</p>
             </div>
 
             <div>
               <h3 className="text-sm font-semibold text-slate-600 mb-1">Resultados</h3>
-              <p className="text-slate-800 text-sm whitespace-pre-wrap">{actividad.resultados}</p>
+              <p className="text-slate-800 text-sm whitespace-pre-wrap break-words">{actividad.resultados}</p>
             </div>
           </div>
 

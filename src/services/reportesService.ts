@@ -1,175 +1,76 @@
 import api from './api';
 
-// ── Tipos de respuesta por gráfica ──────────────────────────────────────────
+// ── Tipos ────────────────────────────────────────────────────────────────────
 
-export interface HorasTurnoRow {
-  mes: string;
-  mesNumero: number;
-  designadas_manana: number;
-  designadas_tarde: number;
-  usadas_manana: number;
-  usadas_tarde: number;
-}
-
-export interface HorasGeneroRow {
-  mes: string;
-  mesNumero: number;
-  mujeres: number;
-  varones: number;
-}
-
-export interface HorasDepartamentoRow {
-  mes: string;
-  mesNumero: number;
-  [departamento: string]: string | number;
-}
-
-export interface CasoGravedadRow {
-  gravedad: string;
-  total: number;
-}
-
-export interface TipologiaGeneroRow {
-  tipologia: string;
-  masculino: number;
-  femenino: number;
-}
-
-export interface ParticipanteCarreraRow {
-  carrera: string;
-  total: number;
-}
-
-export interface HorasEjecutadasVsDesignadasRow {
-  mes: string;
-  mesNumero: number;
-  designadas: number;
-  ejecutadas: number;
-}
-
-export interface SesionesPorMesRow {
-  mes: string;
-  mesNumero: number;
-  total: number;
-}
-
-export interface SesionesPorPsicologoRow {
-  psicologo: string;
-  total: number;
-}
-
-export interface ScorePromedioRow {
-  mes: string;
-  mesNumero: number;
-  estres: number;
-  ansiedad: number;
-  depresion: number;
-}
-
-export interface SemestreRow {
-  semestre: string;
-  total: number;
-}
-
-export interface NuevosPacientesPorMesRow {
-  mes: string;
-  mesNumero: number;
-  universitarios: number;
-  externos: number;
-}
-
-export interface DistribucionGeneroRow {
-  genero: string;
-  total: number;
-}
-
-export interface DistribucionEdadRow {
-  rango: string;
-  total: number;
-}
+export interface CasoGravedadRow   { gravedad: string; total: number }
+export interface CasoSituacionRow  { situacion: string; total: number }
+export interface TipologiaGeneroRow { tipologia: string; masculino: number; femenino: number }
+export interface ParticipanteCarreraRow { carrera: string; total: number }
+export interface HorasDepartamentoRow { mes: string; [dep: string]: string | number }
+export interface SesionesPorMesRow  { mes: string; total: number }
+export interface SesionesPorPsicologoRow { psicologo: string; total: number }
+export interface SesionesPorTurnoRow { mes: string; manana: number; tarde: number }
+export interface PacientesPorPsicologoRow { psicologo: string; total: number }
+export interface ScorePromedioRow   { mes: string; estres: number; ansiedad: number; depresion: number }
+export interface SemestreRow        { semestre: string; total: number }
+export interface NuevosPacientesPorMesRow { mes: string; universitarios: number; externos: number }
+export interface DistribucionGeneroRow { genero: string; total: number }
+export interface DistribucionEdadRow   { rango: string; total: number }
 
 export interface HorasDesignadasInput {
-  psicologoId: number;
-  anio: number;
-  mes: number;
-  turno: 'manana' | 'tarde';
-  horas: number;
+  psicologoId: number; anio: number; mes: number; turno: 'manana' | 'tarde'; horas: number;
 }
 
-// ── Service ─────────────────────────────────────────────────────────────────
+// ── Parámetros de rango (ISO date strings "YYYY-MM-DD") ──────────────────────
+export interface RangoParams { desde: string; hasta: string }
+
+// ── Service ──────────────────────────────────────────────────────────────────
 
 export const reportesService = {
-  horasPorTurno: async (anio: number): Promise<HorasTurnoRow[]> => {
-    const res = await api.get('/reportes/horas-turno', { params: { anio } });
-    return res.data.data ?? [];
-  },
+  // filtrables por rango
+  sesionesPorMes: (r: RangoParams) =>
+    api.get<any>('/reportes/sesiones-por-mes', { params: r }).then(res => (res.data.data ?? []) as SesionesPorMesRow[]),
 
-  horasPorGenero: async (anio: number): Promise<HorasGeneroRow[]> => {
-    const res = await api.get('/reportes/horas-genero', { params: { anio } });
-    return res.data.data ?? [];
-  },
+  sesionesPorTurno: (r: RangoParams) =>
+    api.get<any>('/reportes/sesiones-turno', { params: r }).then(res => (res.data.data ?? []) as SesionesPorTurnoRow[]),
 
-  horasPorDepartamento: async (anio: number): Promise<HorasDepartamentoRow[]> => {
-    const res = await api.get('/reportes/horas-departamento', { params: { anio } });
-    return res.data.data ?? [];
-  },
+  sesionesPorPsicologo: (r: RangoParams) =>
+    api.get<any>('/reportes/sesiones-por-psicologo', { params: r }).then(res => (res.data.data ?? []) as SesionesPorPsicologoRow[]),
 
-  casosPorGravedad: async (): Promise<CasoGravedadRow[]> => {
-    const res = await api.get('/reportes/casos-gravedad');
-    return res.data.data ?? [];
-  },
+  horasPorDepartamento: (r: RangoParams) =>
+    api.get<any>('/reportes/horas-departamento', { params: r }).then(res => (res.data.data ?? []) as HorasDepartamentoRow[]),
 
-  tipologiasPorGenero: async (): Promise<TipologiaGeneroRow[]> => {
-    const res = await api.get('/reportes/tipologias-genero');
-    return res.data.data ?? [];
-  },
+  scorePromedio: (r: RangoParams) =>
+    api.get<any>('/reportes/score-promedio', { params: r }).then(res => (res.data.data ?? []) as ScorePromedioRow[]),
 
-  participantesPorCarrera: async (): Promise<ParticipanteCarreraRow[]> => {
-    const res = await api.get('/reportes/participantes-carrera');
-    return res.data.data ?? [];
-  },
+  casosPorGravedad: (r: RangoParams) =>
+    api.get<any>('/reportes/casos-gravedad', { params: r }).then(res => (res.data.data ?? []) as CasoGravedadRow[]),
 
-  horasEjecutadasVsDesignadas: async (anio: number): Promise<HorasEjecutadasVsDesignadasRow[]> => {
-    const res = await api.get('/reportes/horas-ejecutadas-vs-designadas', { params: { anio } });
-    return res.data.data ?? [];
-  },
+  tipologiasPorGenero: (r: RangoParams) =>
+    api.get<any>('/reportes/tipologias-genero', { params: r }).then(res => (res.data.data ?? []) as TipologiaGeneroRow[]),
 
-  sesionesPorMes: async (anio: number): Promise<SesionesPorMesRow[]> => {
-    const res = await api.get('/reportes/sesiones-por-mes', { params: { anio } });
-    return res.data.data ?? [];
-  },
+  nuevosPacientesPorMes: (r: RangoParams) =>
+    api.get<any>('/reportes/nuevos-pacientes-por-mes', { params: r }).then(res => (res.data.data ?? []) as NuevosPacientesPorMesRow[]),
 
-  sesionesPorPsicologo: async (anio: number): Promise<SesionesPorPsicologoRow[]> => {
-    const res = await api.get('/reportes/sesiones-por-psicologo', { params: { anio } });
-    return res.data.data ?? [];
-  },
+  // acumulados (sin rango)
+  pacientesPorPsicologo: () =>
+    api.get<any>('/reportes/pacientes-por-psicologo').then(res => (res.data.data ?? []) as PacientesPorPsicologoRow[]),
 
-  scorePromedio: async (anio: number): Promise<ScorePromedioRow[]> => {
-    const res = await api.get('/reportes/score-promedio', { params: { anio } });
-    return res.data.data ?? [];
-  },
+  casosPorSituacion: () =>
+    api.get<any>('/reportes/casos-situacion').then(res => (res.data.data ?? []) as CasoSituacionRow[]),
 
-  semestres: async (): Promise<SemestreRow[]> => {
-    const res = await api.get('/reportes/semestres');
-    return res.data.data ?? [];
-  },
+  participantesPorCarrera: () =>
+    api.get<any>('/reportes/participantes-carrera').then(res => (res.data.data ?? []) as ParticipanteCarreraRow[]),
 
-  nuevosPacientesPorMes: async (anio: number): Promise<NuevosPacientesPorMesRow[]> => {
-    const res = await api.get('/reportes/nuevos-pacientes-por-mes', { params: { anio } });
-    return res.data.data ?? [];
-  },
+  semestres: () =>
+    api.get<any>('/reportes/semestres').then(res => (res.data.data ?? []) as SemestreRow[]),
 
-  distribucionGenero: async (): Promise<DistribucionGeneroRow[]> => {
-    const res = await api.get('/reportes/distribucion-genero');
-    return res.data.data ?? [];
-  },
+  distribucionGenero: () =>
+    api.get<any>('/reportes/distribucion-genero').then(res => (res.data.data ?? []) as DistribucionGeneroRow[]),
 
-  distribucionEdad: async (): Promise<DistribucionEdadRow[]> => {
-    const res = await api.get('/reportes/distribucion-edad');
-    return res.data.data ?? [];
-  },
+  distribucionEdad: () =>
+    api.get<any>('/reportes/distribucion-edad').then(res => (res.data.data ?? []) as DistribucionEdadRow[]),
 
-  setHorasDesignadas: async (payload: HorasDesignadasInput): Promise<void> => {
-    await api.put('/reportes/horas-designadas', payload);
-  },
+  setHorasDesignadas: (payload: HorasDesignadasInput) =>
+    api.put('/reportes/horas-designadas', payload),
 };

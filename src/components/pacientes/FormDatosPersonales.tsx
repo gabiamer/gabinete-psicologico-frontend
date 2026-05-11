@@ -15,6 +15,7 @@ interface Props {
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   seleccionarPsicologo: (psicologo: Psicologo) => void;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  disablePsicologo?: boolean;
 }
 
 export const FormDatosPersonales: React.FC<Props> = ({
@@ -27,7 +28,8 @@ export const FormDatosPersonales: React.FC<Props> = ({
   fetchingPsicologos,
   handleChange,
   seleccionarPsicologo,
-  setFormData
+  setFormData,
+  disablePsicologo = false
 }) => {
   const autocompleteRef = useRef<HTMLDivElement>(null);
 
@@ -356,10 +358,12 @@ export const FormDatosPersonales: React.FC<Props> = ({
                 setPsicologoInput(e.target.value);
                 setShowSugerencias(true);
               }}
-              onFocus={() => setShowSugerencias(true)}
+              onFocus={() => !disablePsicologo && setShowSugerencias(true)}
               placeholder={fetchingPsicologos ? "Cargando..." : "Seleccione un psicólogo"}
               className="input-academic"
               autoComplete="off"
+              disabled={disablePsicologo}
+              style={disablePsicologo ? { backgroundColor: '#f1f5f9', cursor: 'not-allowed' } : undefined}
             />
             {showSugerencias && (
               <div className="suggestions-list">

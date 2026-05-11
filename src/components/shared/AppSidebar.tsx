@@ -64,7 +64,7 @@ export default function AppSidebar({
 
       <div className="p-4 border-t border-slate-700">
         {footer ?? (
-          <div className="text-xs text-slate-500 text-center">UMSA - Gabinete Psicologico</div>
+          <div className="text-xs text-slate-500 text-center">UCB Tarija - Gabinete Psicologico</div>
         )}
       </div>
     </aside>

@@ -1,6 +1,6 @@
 import { Brain, Eye, FilePlus, Sparkles, Loader2, MoreHorizontal, AlertTriangle, Shield, ShieldAlert, Trash2 } from 'lucide-react';
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -41,11 +41,11 @@ const situacionColors: Record<string, string> = {
   'Derivado a consultorio externo': 'bg-red-100 text-red-800',
 };
 
-const gravedadConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
-  leve:          { label: 'Leve',        variant: 'secondary',   icon: <Shield className="h-3 w-3" /> },
-  moderado:      { label: 'Moderado',    variant: 'default',     icon: <ShieldAlert className="h-3 w-3" /> },
-  grave:         { label: 'Grave',       variant: 'destructive', icon: <AlertTriangle className="h-3 w-3" /> },
-  'Sin evaluar': { label: 'Sin evaluar', variant: 'outline',     icon: null },
+const gravedadConfig: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
+  leve:          { label: 'Leve',        className: 'bg-emerald-50 text-emerald-700 border border-emerald-200',  icon: <Shield className="h-3 w-3" /> },
+  moderado:      { label: 'Moderado',    className: 'bg-amber-50 text-amber-700 border border-amber-200',        icon: <ShieldAlert className="h-3 w-3" /> },
+  grave:         { label: 'Grave',       className: 'bg-rose-50 text-rose-700 border border-rose-200',           icon: <AlertTriangle className="h-3 w-3" /> },
+  'Sin evaluar': { label: 'Sin evaluar', className: 'bg-slate-100 text-slate-500 border border-slate-200',       icon: null },
 };
 
 interface EntrevistasTableProps {
@@ -127,10 +127,10 @@ export default function EntrevistasTable({
                     : '-'}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={gConfig.variant} className="gap-1 text-xs">
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${gConfig.className}`}>
                     {gConfig.icon}
                     {gConfig.label}
-                  </Badge>
+                  </span>
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <Select

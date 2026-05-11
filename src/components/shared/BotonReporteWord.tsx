@@ -17,6 +17,7 @@ import { saveAs } from "file-saver";
 import { dashboardService } from "@/services/dashboardService";
 import type { EntrevistaRow } from "@/services/dashboardService";
 import { actividadService } from "@/services/actividadService";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Devuelve "1 de enero de 2026" a partir de "2026-01-01"
 function formatFechaLarga(iso: string): string {
@@ -43,6 +44,7 @@ function formatFechaHora(iso: string): string {
 }
 
 export function BotonReporteWord() {
+  const { user } = useAuth()
   const [dialogOpen, setDialogOpen] = useState(false);
   const [generando, setGenerando] = useState(false);
 
@@ -60,22 +62,12 @@ export function BotonReporteWord() {
     try {
       setGenerando(true);
 
-      // 1. Obtener todos los datos
-      const [todasEntrevistas, stats, actividadesRango] = await Promise.all([
-        dashboardService.obtenerEntrevistas(),
+      // 1. Obtener datos: entrevistas ya filtradas por período en el backend
+      const [entrevistas, stats, actividadesRango] = await Promise.all([
+        dashboardService.obtenerEntrevistasPeriodo(fechaDesde, fechaHasta),
         dashboardService.obtenerEstadisticas(),
         actividadService.getByRango(fechaDesde, fechaHasta),
       ]);
-
-      // 2. Filtrar entrevistas por rango de fecha (ultima sesion o sin sesion en el rango)
-      const desde = new Date(fechaDesde + "T00:00:00");
-      const hasta = new Date(fechaHasta + "T23:59:59");
-
-      const entrevistas = todasEntrevistas.filter((e: EntrevistaRow) => {
-        if (!e.ultimaSesionFecha) return false;
-        const fecha = new Date(e.ultimaSesionFecha);
-        return fecha >= desde && fecha <= hasta;
-      });
 
       // 3. Recalcular stats de situacion sobre los pacientes filtrados
       const situacionCount: Record<string, number> = {
@@ -210,6 +202,7 @@ export function BotonReporteWord() {
         actividades: actividadesMapeadas,
         total_actividades: actividadesMapeadas.length,
         problematicas_frecuentes: problematicasFrecuentes,
+        nombre_psicologo: user?.psicologoNombre ?? "",
       });
 
       // 9. Descargar

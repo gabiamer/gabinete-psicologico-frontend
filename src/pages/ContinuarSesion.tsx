@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { dashboardService } from '@/services/dashboardService';
 import type { EntrevistaRow } from '@/services/dashboardService';
+import { usePaginacion } from '@/hooks/usePaginacion';
+import { Paginacion } from '@/components/shared/Paginacion';
 
 export default function ContinuarSesion() {
   const navigate = useNavigate();
@@ -19,8 +21,9 @@ export default function ContinuarSesion() {
   useEffect(() => {
     dashboardService.obtenerEntrevistas()
       .then((data) => {
-        setTodos(data);
-        setFiltrados(data);
+        const invertido = [...data].reverse();
+        setTodos(invertido);
+        setFiltrados(invertido);
       })
       .finally(() => setCargando(false));
   }, []);
@@ -47,6 +50,8 @@ export default function ContinuarSesion() {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [termino, todos]);
+
+  const pag = usePaginacion(filtrados);
 
   return (
     <div className="flex h-screen bg-slate-50 items-start justify-center pt-16 px-4">
@@ -101,7 +106,7 @@ export default function ContinuarSesion() {
                 </div>
               )}
 
-              {filtrados.map((p) => (
+              {pag.paginados.map((p) => (
                 <div
                   key={p.pacienteUniversitarioId}
                   className="flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all"
@@ -135,9 +140,12 @@ export default function ContinuarSesion() {
             </div>
 
             {!cargando && (
-              <p className="text-xs text-slate-400 mt-3 text-right">
-                {filtrados.length} de {todos.length} pacientes
-              </p>
+              <Paginacion
+                pagina={pag.pagina}
+                totalPaginas={pag.totalPaginas}
+                total={pag.total}
+                onChange={pag.setPagina}
+              />
             )}
           </div>
         </div>

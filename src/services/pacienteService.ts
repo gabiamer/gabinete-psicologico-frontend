@@ -154,4 +154,14 @@ export const pacienteService = {
     const response = await api.post('/pacientes/entrevista-completa', payload);
     return response.data.pacienteId;
   },
+
+  transferirPaciente: async (pacienteId: number, nuevoPsicologoId: number) => {
+    const response = await api.post(`/pacientes/universitario/${pacienteId}/transferir`, { nuevoPsicologoId });
+    return response.data;
+  },
+
+  obtenerPsicologoUltimaSesion: async (pacienteId: number) => {
+    const response = await api.get(`/pacientes/universitario/${pacienteId}/psicologo-ultima-sesion`);
+    return response.data.data || response.data;
+  },
 };

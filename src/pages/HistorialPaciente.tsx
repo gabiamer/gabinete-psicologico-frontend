@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, Sparkles, Plus, Loader2, Pencil, Check, X } from "lucide-react"
+import { ArrowLeft, Sparkles, Plus, Loader2, Pencil, Check, X, ArrowRightLeft } from "lucide-react"
 import { pacienteService } from "@/services/pacienteService"
 import { sesionService } from "@/services/sesionService"
+import { useAuth } from "@/contexts/AuthContext"
 import { BotonReporteIndividualExcel } from "@/components/shared/BotonReporteIndividualExcel"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -118,6 +119,7 @@ function InfoField({ label, value }: { label: string; value?: string | number | 
 export default function HistorialPaciente() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  useAuth()
 
   const [paciente, setPaciente] = useState<PacienteData | null>(null)
   const [sesiones, setSesiones] = useState<Record<string, unknown>[]>([])
@@ -134,6 +136,14 @@ export default function HistorialPaciente() {
 
   // Situacion del caso
   const [savingSituacion, setSavingSituacion] = useState(false)
+
+  // Transfer dialog
+  const [transferOpen, setTransferOpen] = useState(false)
+  const [transferPsicologoId, setTransferPsicologoId] = useState<number | "">("")
+  const [transferring, setTransferring] = useState(false)
+
+  // Psicologo de ultima sesion
+  const [psicologoUltimaSesion, setPsicologoUltimaSesion] = useState<string | null>(null)
 
   // Edit datos personales dialog
   const [editDatosOpen, setEditDatosOpen] = useState(false)
@@ -157,6 +167,14 @@ export default function HistorialPaciente() {
       setPaciente(pacienteData as PacienteData)
       setSesiones(Array.isArray(sesionesData) ? sesionesData as Record<string, unknown>[] : [])
       setPsicologos(psicologosData as Psicologo[])
+
+      // Cargar psicologo de ultima sesion
+      try {
+        const psicUltima = await pacienteService.obtenerPsicologoUltimaSesion(Number(id))
+        if (psicUltima?.person) {
+          setPsicologoUltimaSesion(`${psicUltima.person.primerNombre} ${psicUltima.person.apellidoPaterno}`)
+        }
+      } catch { /* no hay sesiones */ }
     } finally {
       setLoading(false)
     }
@@ -270,6 +288,22 @@ export default function HistorialPaciente() {
     }
   }
 
+  // ── Transfer ────────────────────────────────────────────────────────────────
+  async function handleTransfer() {
+    if (!transferPsicologoId) return
+    setTransferring(true)
+    try {
+      await pacienteService.transferirPaciente(Number(id), transferPsicologoId as number)
+      setTransferOpen(false)
+      navigate("/informe")
+    } catch (e) {
+      console.error(e)
+      alert("Error al transferir paciente")
+    } finally {
+      setTransferring(false)
+    }
+  }
+
   // ── Session number ──────────────────────────────────────────────────────────
   function getNumeroSesion(sesion: Record<string, unknown>, fallback: number) {
     if (sesion.acuerdos) {
@@ -290,7 +324,7 @@ export default function HistorialPaciente() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">UMSA / Gabinete Psicologico</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">UCB Tarija / Gabinete Psicologico</p>
             <h1 className="text-lg font-extrabold uppercase tracking-tight">Historial Clínico</h1>
           </div>
         </header>
@@ -381,13 +415,19 @@ export default function HistorialPaciente() {
               {/* Psicólogo */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Psicólogo Asignado</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">Psicólogo Asignado</CardTitle>
+                    <Button variant="ghost" size="sm" onClick={() => setTransferOpen(true)} className="gap-1 h-7 text-slate-500 hover:text-slate-900">
+                      <ArrowRightLeft className="h-3.5 w-3.5" /> Transferir
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm font-semibold text-slate-800">
-                    {paciente.psicologo
-                      ? `${paciente.psicologo.person.primerNombre} ${paciente.psicologo.person.apellidoPaterno}`
-                      : "—"}
+                    {psicologoUltimaSesion
+                      ?? (paciente.psicologo
+                        ? `${paciente.psicologo.person.primerNombre} ${paciente.psicologo.person.apellidoPaterno}`
+                        : "—")}
                   </p>
                   {paciente.psicologo?.ocupacion && (
                     <p className="text-xs text-slate-500 mt-0.5">{paciente.psicologo.ocupacion}</p>
@@ -602,6 +642,40 @@ export default function HistorialPaciente() {
           </div>
         </div>
       </div>
+
+      {/* ── Transfer Dialog ── */}
+      <Dialog open={transferOpen} onOpenChange={setTransferOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Transferir Paciente</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-slate-500">Selecciona el psicólogo al que deseas transferir este paciente. El paciente dejará de aparecer en tu vista.</p>
+          <div className="flex flex-col gap-1.5 py-2">
+            <Label>Nuevo psicólogo</Label>
+            <Select
+              value={transferPsicologoId ? String(transferPsicologoId) : ""}
+              onValueChange={v => setTransferPsicologoId(Number(v))}
+            >
+              <SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
+              <SelectContent>
+                {psicologos
+                  .filter(p => p.id !== paciente.psicologo?.id)
+                  .map(p => (
+                    <SelectItem key={p.id} value={String(p.id)}>
+                      {p.person.primerNombre} {p.person.apellidoPaterno}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTransferOpen(false)}>Cancelar</Button>
+            <Button onClick={handleTransfer} disabled={!transferPsicologoId || transferring}>
+              {transferring ? "Transfiriendo..." : "Transferir"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* ── Edit Datos Dialog ── */}
       <Dialog open={editDatosOpen} onOpenChange={setEditDatosOpen}>

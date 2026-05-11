@@ -21,6 +21,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { actividadService, type Actividad } from "@/services/actividadService"
+import { usePaginacion } from "@/hooks/usePaginacion"
+import { Paginacion } from "@/components/shared/Paginacion"
 
 function formatDate(iso: string): string {
   if (!iso) return "—"
@@ -43,11 +45,13 @@ export default function Actividades() {
     setLoading(true)
     try {
       const acts = await actividadService.getAll()
-      setActividades(acts)
+      setActividades([...acts].reverse())
     } finally {
       setLoading(false)
     }
   }, [])
+
+  const pag = usePaginacion(actividades)
 
   useEffect(() => { load() }, [load])
 
@@ -86,7 +90,7 @@ export default function Actividades() {
             </Button>
           </div>
 
-          <div className="rounded-xl border bg-white overflow-hidden">
+          <div className="rounded-xl border bg-white overflow-hidden" id="tabla-actividades">
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50">
@@ -113,7 +117,7 @@ export default function Actividades() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  actividades.map(a => (
+                  pag.paginados.map(a => (
                     <TableRow key={a.id}>
                       <TableCell className="font-medium max-w-[200px] truncate">{a.titulo}</TableCell>
                       <TableCell>
@@ -149,6 +153,13 @@ export default function Actividades() {
               </TableBody>
             </Table>
           </div>
+
+          <Paginacion
+            pagina={pag.pagina}
+            totalPaginas={pag.totalPaginas}
+            total={pag.total}
+            onChange={pag.setPagina}
+          />
         </div>
       </div>
 

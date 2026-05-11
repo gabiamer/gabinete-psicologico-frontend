@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select"
 import { actividadService, type ActividadInput, type EvidenciaInfo } from "@/services/actividadService"
 import { adminService } from "@/services/adminService"
+import { useAuth } from "@/contexts/AuthContext"
 import type { Psicologo } from "@/types/types"
 
 interface PreviewFile {
@@ -25,6 +26,7 @@ export default function FormularioActividad() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const isEditing = !!id
+  const { user, isAdmin } = useAuth()
 
   const [psicologos, setPsicologos] = useState<Psicologo[]>([])
   const [loading, setLoading] = useState(true)
@@ -72,7 +74,10 @@ export default function FormularioActividad() {
         })
         setEvidenciasExistentes(actividad.evidencias ?? [])
       } else {
-        if (psis.length > 0) {
+        // Auto-asignar psicologo del JWT, o el primero si es admin
+        if (user?.psicologoId) {
+          setForm(f => ({ ...f, psicologoId: user.psicologoId! }))
+        } else if (psis.length > 0) {
           setForm(f => ({ ...f, psicologoId: psis[0].id }))
         }
       }
@@ -195,6 +200,7 @@ export default function FormularioActividad() {
               <Select
                 value={form.psicologoId ? String(form.psicologoId) : ""}
                 onValueChange={v => setForm(f => ({ ...f, psicologoId: Number(v) }))}
+                disabled={!isAdmin}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar..." />

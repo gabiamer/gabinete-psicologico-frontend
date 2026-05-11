@@ -46,7 +46,7 @@ export function GraficaHorasDepartamento({ data }: Props) {
     <Card>
       <CardHeader>
         <CardTitle>Apoyo a Departamentos UCB</CardTitle>
-        <CardDescription>Horas de apoyo por departamento</CardDescription>
+        <CardDescription>Sesiones de atención por departamento académico</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

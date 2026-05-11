@@ -31,6 +31,8 @@ import { dashboardService } from '@/services/dashboardService';
 import type { EntrevistaRow, OrientacionRow, DashboardStats } from '@/services/dashboardService';
 import { pacienteService } from '@/services/pacienteService';
 import type { Psicologo } from '@/types/types';
+import { usePaginacion } from '@/hooks/usePaginacion';
+import { Paginacion } from '@/components/shared/Paginacion';
 
 type TabType = 'entrevistas' | 'orientaciones';
 
@@ -122,7 +124,7 @@ export default function Informe() {
   };
 
   const entrevistasFiltradas = useMemo(() => {
-    return entrevistas.filter((e) => {
+    return [...entrevistas].reverse().filter((e) => {
       const matchSearch =
         !searchTerm ||
         e.estudianteNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -137,13 +139,16 @@ export default function Informe() {
   }, [entrevistas, searchTerm, filtroGravedad, filtroPsicologo, filtroSituacion]);
 
   const orientacionesFiltradas = useMemo(() => {
-    return orientaciones.filter((o) =>
+    return [...orientaciones].reverse().filter((o) =>
       !searchTerm ||
       o.estudianteNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
       o.nombreCompleto.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (o.escuela && o.escuela.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [orientaciones, searchTerm]);
+
+  const pagEntrevistas = usePaginacion(entrevistasFiltradas);
+  const pagOrientaciones = usePaginacion(orientacionesFiltradas);
 
   const hayFiltrosActivos = searchTerm || filtroGravedad !== 'todos' || filtroPsicologo !== 'todos' || filtroSituacion !== 'todos';
 
@@ -152,6 +157,8 @@ export default function Informe() {
     setFiltroGravedad('todos');
     setFiltroPsicologo('todos');
     setFiltroSituacion('todos');
+    pagEntrevistas.resetPagina();
+    pagOrientaciones.resetPagina();
   };
 
   return (
@@ -166,7 +173,7 @@ export default function Informe() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">UMSA</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">UCB Tarija</p>
             <h1 className="text-lg font-extrabold uppercase tracking-tight">Gabinete Psicologico</h1>
           </div>
         </div>
@@ -286,21 +293,32 @@ export default function Informe() {
               </Card>
               <Card className="border-slate-200">
                 <CardContent className="p-4 flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
                     <Activity className="h-5 w-5 text-purple-600" />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      {stats.gravedadDistribucion && (
-                        <>
-                          <span className="text-xs font-bold text-emerald-600">{stats.gravedadDistribucion.leve}L</span>
-                          <span className="text-xs font-bold text-amber-600">{stats.gravedadDistribucion.moderado}M</span>
-                          <span className="text-xs font-bold text-red-600">{stats.gravedadDistribucion.grave}G</span>
-                        </>
-                      )}
+                  {stats.gravedadDistribucion ? (
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col items-center">
+                        <span className="text-2xl font-extrabold text-emerald-600">{stats.gravedadDistribucion.leve}</span>
+                        <span className="text-[10px] uppercase font-bold text-emerald-500 tracking-wide">Leve</span>
+                      </div>
+                      <div className="w-px h-8 bg-slate-200" />
+                      <div className="flex flex-col items-center">
+                        <span className="text-2xl font-extrabold text-amber-600">{stats.gravedadDistribucion.moderado}</span>
+                        <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wide">Mod.</span>
+                      </div>
+                      <div className="w-px h-8 bg-slate-200" />
+                      <div className="flex flex-col items-center">
+                        <span className="text-2xl font-extrabold text-rose-600">{stats.gravedadDistribucion.grave}</span>
+                        <span className="text-[10px] uppercase font-bold text-rose-500 tracking-wide">Grave</span>
+                      </div>
                     </div>
-                    <p className="text-xs text-slate-500 uppercase font-semibold">Gravedad</p>
-                  </div>
+                  ) : (
+                    <div>
+                      <p className="text-2xl font-extrabold text-slate-900">—</p>
+                      <p className="text-xs text-slate-500 uppercase font-semibold">Gravedad</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -384,22 +402,38 @@ export default function Informe() {
               ))}
             </div>
           ) : activeTab === 'entrevistas' ? (
-            <EntrevistasTable
-              data={entrevistasFiltradas}
-              onVerHistorial={(id) => navigate(`/pacientes/${id}/historial`)}
-              onNuevaSesion={(id) => navigate(`/pacientes/${id}/nueva-sesion`)}
-              onGenerarResumen={handleGenerarResumen}
-              onCambiarSituacion={handleCambiarSituacion}
-              onEliminar={handleEliminarEntrevista}
-              generandoId={generandoId}
-            />
+            <>
+              <EntrevistasTable
+                data={pagEntrevistas.paginados}
+                onVerHistorial={(id) => navigate(`/pacientes/${id}/historial`)}
+                onNuevaSesion={(id) => navigate(`/pacientes/${id}/nueva-sesion`)}
+                onGenerarResumen={handleGenerarResumen}
+                onCambiarSituacion={handleCambiarSituacion}
+                onEliminar={handleEliminarEntrevista}
+                generandoId={generandoId}
+              />
+              <Paginacion
+                pagina={pagEntrevistas.pagina}
+                totalPaginas={pagEntrevistas.totalPaginas}
+                total={pagEntrevistas.total}
+                onChange={pagEntrevistas.setPagina}
+              />
+            </>
           ) : (
-            <OrientacionesTable
-              data={orientacionesFiltradas}
-              onVerDetalle={(id) => navigate(`/pacientes-externos/${id}/detalle-orientacion`)}
-              onNuevaOrientacion={(id) => navigate(`/pacientes-externos/${id}/orientacion-vocacional`)}
-              onEliminar={handleEliminarOrientacion}
-            />
+            <>
+              <OrientacionesTable
+                data={pagOrientaciones.paginados}
+                onVerDetalle={(id) => navigate(`/pacientes-externos/${id}/detalle-orientacion`)}
+                onNuevaOrientacion={(id) => navigate(`/pacientes-externos/${id}/orientacion-vocacional`)}
+                onEliminar={handleEliminarOrientacion}
+              />
+              <Paginacion
+                pagina={pagOrientaciones.pagina}
+                totalPaginas={pagOrientaciones.totalPaginas}
+                total={pagOrientaciones.total}
+                onChange={pagOrientaciones.setPagina}
+              />
+            </>
           )}
         </div>
       </div>

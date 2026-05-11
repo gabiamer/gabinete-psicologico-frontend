@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { FormData, AntecedentesData, Psicologo } from '../types/types';
 import { pacienteService } from '../services/pacienteService';
+import { useAuth } from '../contexts/AuthContext';
 import { calcularEdad } from '../utils/calculos';
 import { FormDatosPersonales } from '../components/pacientes/FormDatosPersonales';
 import { FormAntecedentes } from '../components/pacientes/FormAntecedentes';
@@ -27,6 +28,7 @@ const PASOS = [
 
 const RegistroPaciente: React.FC = () => {
   const navigate = useNavigate();
+  const { user, isAdmin } = useAuth();
   const [paso, setPaso] = useState<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8>(1);
 
   const [formData, setFormData] = useState<FormData>({
@@ -99,7 +101,16 @@ const RegistroPaciente: React.FC = () => {
       setFetchingPsicologos(true);
       try {
         const data = await pacienteService.obtenerPsicologos();
-        setPsicologos(Array.isArray(data) ? data : []);
+        const lista = Array.isArray(data) ? data : [];
+        setPsicologos(lista);
+        // Auto-asignar psicologo del JWT si no es admin
+        if (user?.psicologoId) {
+          const psi = lista.find((p: Psicologo) => p.id === user.psicologoId);
+          if (psi) {
+            setFormData(prev => ({ ...prev, psicologoId: psi.id }));
+            setPsicologoInput(`${psi.person.primerNombre} ${psi.person.apellidoPaterno}`);
+          }
+        }
       } catch (err) {
         console.error('Error cargando psicólogos:', err);
         setError('No se pudieron cargar los profesionales');
@@ -220,6 +231,7 @@ const RegistroPaciente: React.FC = () => {
               setPsicologoInput={setPsicologoInput} showSugerencias={showSugerencias}
               setShowSugerencias={setShowSugerencias} fetchingPsicologos={fetchingPsicologos}
               handleChange={handleChangeStep1} seleccionarPsicologo={seleccionarPsicologo} setFormData={setFormData}
+              disablePsicologo={!isAdmin && !!user?.psicologoId}
             />
             <div className="actions-footer">
               <button type="button" className="btn-back-dashboard" onClick={() => navigate('/')}>
