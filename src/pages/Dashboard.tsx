@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { FileText, UserPlus, PlayCircle, Settings } from "lucide-react"
+import { FileText, UserPlus, PlayCircle, Settings, ClipboardList } from "lucide-react"
 import AccionCard from "@/components/dashboard/AccionCard"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
@@ -139,7 +139,7 @@ export default function Dashboard() {
           </p>
 
           {/* AccionCards */}
-          <div className="grid grid-cols-4 gap-6">
+          <div className="grid grid-cols-5 gap-6">
             <AccionCard
               icon={FileText}
               title="Ver Informe"
@@ -160,6 +160,13 @@ export default function Dashboard() {
               description="Busca un paciente existente para agregar una nueva sesion"
               onClick={() => navigate("/continuar-sesion")}
               colorScheme="amber"
+            />
+            <AccionCard
+              icon={ClipboardList}
+              title="Actividades"
+              description="Registra actividades realizadas por los psicologos"
+              onClick={() => navigate("/actividades")}
+              colorScheme="teal"
             />
             <AccionCard
               icon={Settings}

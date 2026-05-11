@@ -11,6 +11,9 @@ import DetalleSesion from './pages/DetalleSesion';
 import DetalleOrientacionVocacional from './pages/DetalleOrientacionVocacional';
 import EntrevistaOrientacionVocacional from './pages/EntrevistaOrientacionVocacional';
 import Configuracion from './pages/Configuracion';
+import Actividades from './pages/Actividades';
+import FormularioActividad from './pages/FormularioActividad';
+import DetalleActividad from './pages/DetalleActividad';
 
 function App() {
   return (
@@ -29,6 +32,10 @@ function App() {
         <Route path="/pacientes-externos/:id/orientacion-vocacional" element={<EntrevistaOrientacionVocacional />} />
         <Route path="/nueva-orientacion" element={<EntrevistaOrientacionVocacional />} />
         <Route path="/configuracion" element={<Configuracion />} />
+        <Route path="/actividades" element={<Actividades />} />
+        <Route path="/actividades/nueva" element={<FormularioActividad />} />
+        <Route path="/actividades/:id" element={<DetalleActividad />} />
+        <Route path="/actividades/:id/editar" element={<FormularioActividad />} />
       </Routes>
     </BrowserRouter>
   );

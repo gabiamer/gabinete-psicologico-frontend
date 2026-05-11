@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-type ColorScheme = 'indigo' | 'emerald' | 'amber' | 'slate';
+type ColorScheme = 'indigo' | 'emerald' | 'amber' | 'slate' | 'teal';
 
 interface AccionCardProps {
   icon: React.ElementType;
@@ -34,6 +34,12 @@ const colorMap: Record<ColorScheme, { bg: string; iconBg: string; iconColor: str
     iconBg: 'bg-slate-100',
     iconColor: 'text-slate-600',
     hover: 'hover:shadow-slate-100',
+  },
+  teal: {
+    bg: 'bg-white border-teal-100 hover:border-teal-400',
+    iconBg: 'bg-teal-100',
+    iconColor: 'text-teal-600',
+    hover: 'hover:shadow-teal-100',
   },
 };
 

@@ -75,6 +75,11 @@ export const dashboardService = {
     };
   },
 
+  extraerProblematicasFrecuentes: async (problematicas: string[]): Promise<string[]> => {
+    const response = await api.post('/pacientes/problematicas-frecuentes', problematicas);
+    return response.data.data;
+  },
+
   eliminarEntrevista: async (id: number): Promise<void> => {
     await api.delete(`/pacientes/universitario/${id}`);
   },
