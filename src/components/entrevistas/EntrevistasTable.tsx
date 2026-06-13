@@ -78,21 +78,20 @@ export default function EntrevistasTable({
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+      <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow className="bg-slate-50">
-            <TableHead className="font-bold text-xs uppercase text-slate-600 w-16">Nro</TableHead>
-            {/* <TableHead className="font-bold text-xs uppercase text-slate-600">Estudiante</TableHead>
-            <TableHead className="font-bold text-xs uppercase text-slate-600">Derivado por</TableHead> */}
-            <TableHead className="font-bold text-xs uppercase text-slate-600">Carrera</TableHead>
-            <TableHead className="font-bold text-xs uppercase text-slate-600 text-center">Sesiones</TableHead>
-            <TableHead className="font-bold text-xs uppercase text-slate-600">Ultima Sesion</TableHead>
+            <TableHead className="font-bold text-xs uppercase text-slate-600 w-12">Nro</TableHead>
+            <TableHead className="font-bold text-xs uppercase text-slate-600 hidden sm:table-cell">Carrera</TableHead>
+            <TableHead className="font-bold text-xs uppercase text-slate-600 text-center hidden sm:table-cell">Ses.</TableHead>
+            <TableHead className="font-bold text-xs uppercase text-slate-600 hidden lg:table-cell">Ult. Sesion</TableHead>
             <TableHead className="font-bold text-xs uppercase text-slate-600">Gravedad</TableHead>
-            <TableHead className="font-bold text-xs uppercase text-slate-600">Situacion del Caso</TableHead>
-            <TableHead className="font-bold text-xs uppercase text-slate-600">Psicologo</TableHead>
-            <TableHead className="font-bold text-xs uppercase text-slate-600 max-w-[180px]">Descripcion</TableHead>
-            <TableHead className="font-bold text-xs uppercase text-slate-600 max-w-[180px]">Problematica</TableHead>
-            <TableHead className="font-bold text-xs uppercase text-slate-600 w-16"></TableHead>
+            <TableHead className="font-bold text-xs uppercase text-slate-600">Situacion</TableHead>
+            <TableHead className="font-bold text-xs uppercase text-slate-600 hidden md:table-cell">Psicologo</TableHead>
+            <TableHead className="font-bold text-xs uppercase text-slate-600 max-w-[180px] hidden xl:table-cell">Descripcion</TableHead>
+            <TableHead className="font-bold text-xs uppercase text-slate-600 max-w-[180px] hidden xl:table-cell">Problematica</TableHead>
+            <TableHead className="font-bold text-xs uppercase text-slate-600 w-12"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -110,13 +109,13 @@ export default function EntrevistasTable({
                   <span className="font-semibold text-slate-900">{row.estudianteNombre}</span>
                 </TableCell>
                 <TableCell className="text-slate-600 text-sm">{row.derivadoPor || '-'}</TableCell> */}
-                <TableCell className="text-sm text-slate-700">{row.carrera}</TableCell>
-                <TableCell className="text-center">
+                <TableCell className="text-sm text-slate-700 hidden sm:table-cell">{row.carrera}</TableCell>
+                <TableCell className="text-center hidden sm:table-cell">
                   <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">
                     {row.numeroSesiones}
                   </span>
                 </TableCell>
-                <TableCell className="text-sm text-slate-500">
+                <TableCell className="text-sm text-slate-500 hidden lg:table-cell">
                   {row.ultimaSesionFecha
                     ? new Date(row.ultimaSesionFecha).toLocaleDateString('es-ES', {
                         day: '2-digit',
@@ -152,8 +151,8 @@ export default function EntrevistasTable({
                     </SelectContent>
                   </Select>
                 </TableCell>
-                <TableCell className="text-sm text-slate-600">{row.psicologoNombre}</TableCell>
-                <TableCell className="max-w-[180px]">
+                <TableCell className="text-sm text-slate-600 hidden md:table-cell">{row.psicologoNombre}</TableCell>
+                <TableCell className="max-w-[180px] hidden xl:table-cell">
                   {row.descripcion ? (
                     <span className="text-xs text-slate-600 line-clamp-2" title={row.descripcion}>
                       {row.descripcion}
@@ -162,7 +161,7 @@ export default function EntrevistasTable({
                     <span className="text-xs text-slate-400 italic">Sin generar</span>
                   )}
                 </TableCell>
-                <TableCell className="max-w-[180px]">
+                <TableCell className="max-w-[180px] hidden xl:table-cell">
                   {row.principalProblematica ? (
                     <span className="text-xs text-slate-600 line-clamp-2" title={row.principalProblematica}>
                       {row.principalProblematica}
@@ -222,6 +221,7 @@ export default function EntrevistasTable({
           })}
         </TableBody>
       </Table>
+      </div>
     </div>
   );
 }

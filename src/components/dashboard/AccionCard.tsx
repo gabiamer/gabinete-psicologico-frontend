@@ -58,17 +58,17 @@ export default function AccionCard({
     <button
       onClick={onClick}
       className={cn(
-        'flex flex-col items-center justify-center gap-4 p-8 rounded-2xl border-2 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-lg text-center w-full',
+        'flex flex-col items-center justify-center gap-3 lg:gap-4 p-5 lg:p-8 rounded-xl lg:rounded-2xl border-2 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-lg text-center w-full',
         colors.bg,
         colors.hover
       )}
     >
-      <div className={cn('h-16 w-16 rounded-2xl flex items-center justify-center', colors.iconBg)}>
-        <Icon className={cn('h-8 w-8', colors.iconColor)} />
+      <div className={cn('h-12 w-12 lg:h-16 lg:w-16 rounded-xl lg:rounded-2xl flex items-center justify-center', colors.iconBg)}>
+        <Icon className={cn('h-6 w-6 lg:h-8 lg:w-8', colors.iconColor)} />
       </div>
       <div>
-        <p className="text-lg font-extrabold text-foreground uppercase tracking-tight">{title}</p>
-        <p className="text-sm text-muted-foreground mt-1">{description}</p>
+        <p className="text-sm lg:text-lg font-extrabold text-foreground uppercase tracking-tight">{title}</p>
+        <p className="text-xs lg:text-sm text-muted-foreground mt-0.5 lg:mt-1 hidden sm:block">{description}</p>
       </div>
     </button>
   );

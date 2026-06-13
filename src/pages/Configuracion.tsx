@@ -124,6 +124,7 @@ function PsicologosTab() {
       </div>
 
       <div className="rounded-xl border bg-white overflow-hidden">
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50">
@@ -179,15 +180,16 @@ function PsicologosTab() {
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
 
       {/* Create / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{editing ? "Editar Psicólogo" : "Agregar Psicólogo"}</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-3 py-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-2">
             <div className="flex flex-col gap-1.5">
               <Label>Primer nombre *</Label>
               <Input
@@ -332,6 +334,7 @@ function CarrerasTab() {
       </div>
 
       <div className="rounded-xl border bg-white overflow-hidden">
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50">
@@ -377,6 +380,7 @@ function CarrerasTab() {
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -693,24 +697,24 @@ export default function Configuracion() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-primary text-primary-foreground px-8 py-4 flex-shrink-0 flex items-center gap-4">
+      <header className="bg-primary text-primary-foreground px-4 lg:px-8 py-3 lg:py-4 flex-shrink-0 flex items-center gap-4">
         <button
           onClick={() => navigate("/")}
-          className="text-slate-400 hover:text-white transition-colors"
+          className="text-primary-foreground/60 hover:text-white transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+          <p className="hidden sm:block text-xs font-semibold uppercase tracking-widest text-primary-foreground/60">
             UCB Tarija / Gabinete Psicologico
           </p>
-          <h1 className="text-lg font-extrabold uppercase tracking-tight">
+          <h1 className="text-sm lg:text-lg font-extrabold uppercase tracking-tight">
             Configuración
           </h1>
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col items-center px-8 py-10">
+      <div className="flex-1 flex flex-col items-center px-4 lg:px-8 py-6 lg:py-10">
         <div className="w-full max-w-5xl">
           <Tabs defaultValue="psicologos">
             <TabsList className="mb-6 bg-white border">

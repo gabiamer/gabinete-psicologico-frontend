@@ -165,7 +165,7 @@ export default function FormularioActividad() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-primary text-primary-foreground px-8 py-4 flex-shrink-0 flex items-center gap-4">
+      <header className="bg-primary text-primary-foreground px-4 lg:px-8 py-3 lg:py-4 flex-shrink-0 flex items-center gap-4">
         <button
           onClick={() => navigate("/actividades")}
           className="text-slate-400 hover:text-white transition-colors"
@@ -182,7 +182,7 @@ export default function FormularioActividad() {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col items-center px-8 py-10">
+      <div className="flex-1 flex flex-col items-center px-4 lg:px-8 py-6 lg:py-10">
         <div className="w-full max-w-3xl space-y-6">
           {/* Titulo */}
           <div className="flex flex-col gap-1.5">

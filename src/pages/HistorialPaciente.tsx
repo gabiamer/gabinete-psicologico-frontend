@@ -322,7 +322,7 @@ export default function HistorialPaciente() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col">
-        <header className="bg-primary text-primary-foreground px-8 py-4 flex-shrink-0 flex items-center gap-4">
+        <header className="bg-primary text-primary-foreground px-4 lg:px-8 py-3 lg:py-4 flex-shrink-0 flex items-center gap-4">
           <button onClick={() => navigate('/informe')} className="text-slate-400 hover:text-white transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -331,7 +331,7 @@ export default function HistorialPaciente() {
             <h1 className="text-lg font-extrabold uppercase tracking-tight">Historial Clínico</h1>
           </div>
         </header>
-        <div className="flex-1 flex flex-col items-center px-8 py-10">
+        <div className="flex-1 flex flex-col items-center px-4 lg:px-8 py-6 lg:py-10">
           <div className="w-full max-w-5xl flex flex-col gap-6">
             <Skeleton className="h-48 w-full rounded-2xl" />
             <Skeleton className="h-32 w-full rounded-2xl" />
@@ -375,13 +375,13 @@ export default function HistorialPaciente() {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col items-center px-8 py-8">
-        <div className="w-full max-w-5xl flex flex-col gap-6">
+      <div className="flex-1 flex flex-col items-center px-4 lg:px-8 py-4 lg:py-8">
+        <div className="w-full max-w-5xl flex flex-col gap-4 lg:gap-6">
 
           {/* ── Datos del paciente + sidebar ── */}
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
             {/* Datos personales */}
-            <Card className="col-span-2">
+            <Card className="lg:col-span-2">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base">Datos del Paciente</CardTitle>
@@ -391,7 +391,7 @@ export default function HistorialPaciente() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-3 gap-x-6 gap-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3 lg:gap-x-6 lg:gap-y-4">
                   <InfoField label="Nombre completo" value={nombreCompleto} />
                   <InfoField label="Edad" value={paciente.paciente.edad != null ? `${paciente.paciente.edad} años` : null} />
                   <InfoField label="Fecha de nacimiento" value={
@@ -648,7 +648,7 @@ export default function HistorialPaciente() {
 
       {/* ── Transfer Dialog ── */}
       <Dialog open={transferOpen} onOpenChange={setTransferOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Transferir Paciente</DialogTitle>
           </DialogHeader>
@@ -682,11 +682,11 @@ export default function HistorialPaciente() {
 
       {/* ── Edit Datos Dialog ── */}
       <Dialog open={editDatosOpen} onOpenChange={setEditDatosOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Datos del Paciente</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 py-2">
             <div className="flex flex-col gap-1.5">
               <Label>Primer nombre *</Label>
               <Input value={editDatosForm.primerNombre} onChange={e => setEditDatosForm(f => ({ ...f, primerNombre: e.target.value }))} />

@@ -164,32 +164,33 @@ export default function Informe() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Top bar con branding */}
-      <header className="bg-primary text-primary-foreground px-8 py-4 flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-4">
+      <header className="bg-primary text-primary-foreground px-4 lg:px-8 py-3 lg:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 flex-shrink-0">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/')}
-            className="text-slate-400 hover:text-white transition-colors"
+            className="text-primary-foreground/60 hover:text-white transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">UCB Tarija</p>
-            <h1 className="text-lg font-extrabold uppercase tracking-tight">Gabinete Psicologico</h1>
+            <p className="hidden sm:block text-xs font-semibold uppercase tracking-widest text-primary-foreground/60">UCB Tarija</p>
+            <h1 className="text-sm lg:text-lg font-extrabold uppercase tracking-tight">Gabinete Psicologico</h1>
           </div>
         </div>
 
         {/* Toggle switch Entrevistas / Orientaciones */}
-        <div className="flex items-center bg-white/10 rounded-lg p-1 gap-1">
+        <div className="flex items-center bg-white/10 rounded-lg p-1 gap-1 self-start sm:self-auto">
           <button
             onClick={() => setActiveTab('entrevistas')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold transition-all ${
               activeTab === 'entrevistas'
                 ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                : 'text-primary-foreground/70 hover:text-white'
             }`}
           >
-            <Brain className="h-4 w-4" />
-            Entrevistas
+            <Brain className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline">Entrevistas</span>
+            <span className="xs:hidden">Entr.</span>
             <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
               activeTab === 'entrevistas' ? 'bg-accent/20 text-accent-foreground' : 'bg-white/10 text-primary-foreground/70'
             }`}>
@@ -198,14 +199,15 @@ export default function Informe() {
           </button>
           <button
             onClick={() => setActiveTab('orientaciones')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold transition-all ${
               activeTab === 'orientaciones'
                 ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                : 'text-primary-foreground/70 hover:text-white'
             }`}
           >
-            <Compass className="h-4 w-4" />
-            Orientaciones
+            <Compass className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline">Orientaciones</span>
+            <span className="xs:hidden">Orient.</span>
             <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
               activeTab === 'orientaciones' ? 'bg-accent/20 text-accent-foreground' : 'bg-white/10 text-primary-foreground/70'
             }`}>
@@ -217,38 +219,42 @@ export default function Informe() {
 
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Subheader con título y acciones */}
-        <div className="bg-white border-b border-slate-200 px-8 py-4 flex items-center justify-between flex-shrink-0">
+        <div className="bg-white border-b border-slate-200 px-4 lg:px-8 py-3 lg:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 flex-shrink-0">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-900 uppercase tracking-tight">
+            <h2 className="text-base lg:text-xl font-extrabold text-slate-900 uppercase tracking-tight">
               {activeTab === 'entrevistas' ? 'Entrevistas Psicologicas' : 'Orientaciones Vocacionales'}
             </h2>
-            <p className="text-sm text-slate-500 mt-0.5">
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
               {activeTab === 'entrevistas'
                 ? `${entrevistasFiltradas.length} registro${entrevistasFiltradas.length !== 1 ? 's' : ''}`
                 : `${orientacionesFiltradas.length} registro${orientacionesFiltradas.length !== 1 ? 's' : ''}`}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
             <Button variant="outline" size="sm" onClick={cargarDatos} disabled={loading}>
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              Actualizar
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline ml-2">Actualizar</span>
             </Button>
             <BotonReporteWord />
             {activeTab === 'entrevistas' ? (
               <Button
                 onClick={() => navigate('/registro-paciente')}
                 className="font-bold uppercase text-xs tracking-wide"
+                size="sm"
               >
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Paciente
+                <Plus className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Nuevo Paciente</span>
+                <span className="sm:hidden">Nuevo</span>
               </Button>
             ) : (
               <Button
                 onClick={() => navigate('/registro-paciente-externo')}
                 className="font-bold uppercase text-xs tracking-wide"
+                size="sm"
               >
-                <Plus className="h-4 w-4 mr-2" />
-                Nueva Orientacion
+                <Plus className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Nueva Orientacion</span>
+                <span className="sm:hidden">Nueva</span>
               </Button>
             )}
           </div>
@@ -256,8 +262,8 @@ export default function Informe() {
 
         {/* Stats */}
         {!loading && stats && (
-          <div className="px-8 pt-6 pb-2 flex-shrink-0">
-            <div className="grid grid-cols-4 gap-4">
+          <div className="px-4 lg:px-8 pt-4 lg:pt-6 pb-2 flex-shrink-0">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
               <Card className="border-slate-200">
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="h-10 w-10 rounded-xl bg-blue-100 flex items-center justify-center">
@@ -326,9 +332,9 @@ export default function Informe() {
         )}
 
         {/* Filtros */}
-        <div className="px-8 py-4 flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1 max-w-sm">
+        <div className="px-4 lg:px-8 py-3 lg:py-4 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 flex-wrap">
+            <div className="relative flex-1 min-w-0 sm:max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
                 placeholder={activeTab === 'entrevistas' ? 'Buscar por nombre, carrera...' : 'Buscar por nombre, escuela...'}
@@ -341,7 +347,7 @@ export default function Informe() {
             {activeTab === 'entrevistas' && (
               <>
                 <Select value={filtroPsicologo} onValueChange={setFiltroPsicologo}>
-                  <SelectTrigger className="w-52">
+                  <SelectTrigger className="w-full sm:w-52">
                     <SelectValue placeholder="Psicologo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -355,7 +361,7 @@ export default function Informe() {
                 </Select>
 
                 <Select value={filtroGravedad} onValueChange={setFiltroGravedad}>
-                  <SelectTrigger className="w-44">
+                  <SelectTrigger className="w-full sm:w-44">
                     <SelectValue placeholder="Gravedad" />
                   </SelectTrigger>
                   <SelectContent>
@@ -368,7 +374,7 @@ export default function Informe() {
                 </Select>
 
                 <Select value={filtroSituacion} onValueChange={setFiltroSituacion}>
-                  <SelectTrigger className="w-56">
+                  <SelectTrigger className="w-full sm:w-56">
                     <SelectValue placeholder="Situacion del caso" />
                   </SelectTrigger>
                   <SelectContent>
@@ -394,7 +400,7 @@ export default function Informe() {
 
         <Separator />
 
-        <div className="flex-1 overflow-auto px-8 py-4">
+        <div className="flex-1 overflow-auto px-2 sm:px-4 lg:px-8 py-4">
           {loading ? (
             <div className="space-y-3">
               {Array.from({ length: 8 }).map((_, i) => (

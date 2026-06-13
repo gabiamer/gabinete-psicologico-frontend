@@ -67,7 +67,7 @@ export default function ContinuarSesion() {
         </Button>
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="bg-primary px-8 py-6">
+          <div className="bg-primary px-6 py-5">
             <h1 className="text-xl font-extrabold text-primary-foreground uppercase tracking-tight">
               Continuar Sesion
             </h1>
@@ -76,7 +76,7 @@ export default function ContinuarSesion() {
             </p>
           </div>
 
-          <div className="px-8 py-6">
+          <div className="px-4 sm:px-8 py-5 sm:py-6">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input

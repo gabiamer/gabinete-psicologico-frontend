@@ -64,7 +64,7 @@ export default function Actividades() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-primary text-primary-foreground px-8 py-4 flex-shrink-0 flex items-center gap-4">
+      <header className="bg-primary text-primary-foreground px-4 lg:px-8 py-3 lg:py-4 flex-shrink-0 flex items-center gap-3">
         <button
           onClick={() => navigate("/")}
           className="text-slate-400 hover:text-white transition-colors"
@@ -81,9 +81,9 @@ export default function Actividades() {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col items-center px-8 py-10">
+      <div className="flex-1 flex flex-col items-center px-4 lg:px-8 py-6 lg:py-10">
         <div className="w-full max-w-6xl">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4 lg:mb-6">
             <h3 className="text-lg font-semibold text-slate-800">Registro de Actividades</h3>
             <Button onClick={() => navigate("/actividades/nueva")} size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> Nueva Actividad
@@ -91,67 +91,69 @@ export default function Actividades() {
           </div>
 
           <div className="rounded-xl border bg-white overflow-hidden" id="tabla-actividades">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-slate-50">
-                  <TableHead>Titulo</TableHead>
-                  <TableHead>Psicologo</TableHead>
-                  <TableHead>Fecha Inicio</TableHead>
-                  <TableHead>Fecha Fin</TableHead>
-                  <TableHead>Poblacion</TableHead>
-                  <TableHead className="text-center">Asistentes</TableHead>
-                  <TableHead className="w-24 text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-slate-400 py-8">
-                      Cargando...
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50">
+                    <TableHead>Titulo</TableHead>
+                    <TableHead className="hidden sm:table-cell">Psicologo</TableHead>
+                    <TableHead>Fecha Inicio</TableHead>
+                    <TableHead className="hidden md:table-cell">Fecha Fin</TableHead>
+                    <TableHead className="hidden lg:table-cell">Poblacion</TableHead>
+                    <TableHead className="text-center hidden sm:table-cell">Asistentes</TableHead>
+                    <TableHead className="w-20 text-right">Acciones</TableHead>
                   </TableRow>
-                ) : actividades.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center text-slate-400 py-8">
-                      No hay actividades registradas
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  pag.paginados.map(a => (
-                    <TableRow key={a.id}>
-                      <TableCell className="font-medium max-w-[200px] truncate">{a.titulo}</TableCell>
-                      <TableCell>
-                        {a.psicologo.person.primerNombre} {a.psicologo.person.apellidoPaterno}
-                      </TableCell>
-                      <TableCell>{formatDate(a.fechaInicio)}</TableCell>
-                      <TableCell>{formatDate(a.fechaFin)}</TableCell>
-                      <TableCell className="max-w-[150px] truncate">{a.poblacion}</TableCell>
-                      <TableCell className="text-center">{a.numAsistentes}</TableCell>
-                      <TableCell>
-                        <div className="flex justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-slate-500 hover:text-slate-900"
-                            onClick={() => navigate(`/actividades/${a.id}`)}
-                          >
-                            <Eye className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 text-red-400 hover:text-red-600"
-                            onClick={() => setDeleteId(a.id)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-slate-400 py-8">
+                        Cargando...
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                  ) : actividades.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-slate-400 py-8">
+                        No hay actividades registradas
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    pag.paginados.map(a => (
+                      <TableRow key={a.id}>
+                        <TableCell className="font-medium max-w-[140px] sm:max-w-[200px] truncate">{a.titulo}</TableCell>
+                        <TableCell className="hidden sm:table-cell">
+                          {a.psicologo.person.primerNombre} {a.psicologo.person.apellidoPaterno}
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm">{formatDate(a.fechaInicio)}</TableCell>
+                        <TableCell className="hidden md:table-cell text-xs sm:text-sm">{formatDate(a.fechaFin)}</TableCell>
+                        <TableCell className="hidden lg:table-cell max-w-[150px] truncate">{a.poblacion}</TableCell>
+                        <TableCell className="text-center hidden sm:table-cell">{a.numAsistentes}</TableCell>
+                        <TableCell>
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-slate-500 hover:text-slate-900"
+                              onClick={() => navigate(`/actividades/${a.id}`)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-red-400 hover:text-red-600"
+                              onClick={() => setDeleteId(a.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
 
           <Paginacion

@@ -347,28 +347,71 @@
 @media (max-width: 768px) {
   .registro-wrapper {
     max-width: 100%;
-    padding: 0 16px;
+    padding: 0 12px;
+    margin: 16px auto;
+  }
+
+  .banner-header {
+    padding: 28px 20px;
+  }
+
+  .banner-header h1 {
+    font-size: 1.4rem;
   }
 
   .form-content {
-    padding: 30px 20px;
+    padding: 24px 16px;
+  }
+
+  .form-section {
+    margin-bottom: 36px;
+  }
+
+  .section-title {
+    margin-bottom: 20px;
   }
 
   .grid-2-cols {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .grid-fields {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .stepper-container {
-    gap: 20px;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .step-indicator span {
     display: none; /* Oculta el texto en móvil, solo muestra círculos */
   }
 
-  .btn-submit {
-    padding: 14px 30px;
+  .actions-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .btn-submit, .btn-cancel {
+    padding: 14px 20px;
     font-size: 0.9rem;
+    min-width: unset;
+    width: 100%;
+  }
+
+  .resultado-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .resultado-acciones {
+    width: 100%;
   }
 }

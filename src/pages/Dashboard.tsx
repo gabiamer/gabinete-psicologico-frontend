@@ -130,20 +130,20 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar con branding UCB */}
-      <header className="bg-primary text-primary-foreground px-8 py-4 flex-shrink-0 flex items-center justify-between border-b-4 border-accent">
-        <div className="flex items-center gap-4">
-          <img src="/UCB LOGO.png" alt="UCB" className="h-10 object-contain" />
-          <div className="border-l border-white/30 pl-4">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary-foreground/60">
+      <header className="bg-primary text-primary-foreground px-4 lg:px-8 py-3 lg:py-4 flex-shrink-0 flex items-center justify-between border-b-4 border-accent">
+        <div className="flex items-center gap-3">
+          <img src="/UCB LOGO.png" alt="UCB" className="h-8 lg:h-10 object-contain" />
+          <div className="border-l border-white/30 pl-3">
+            <p className="hidden sm:block text-xs font-semibold uppercase tracking-widest text-primary-foreground/60">
               UCB Tarija
             </p>
-            <h1 className="text-lg font-extrabold uppercase tracking-tight">
+            <h1 className="text-sm lg:text-lg font-extrabold uppercase tracking-tight">
               Gabinete Psicológico
             </h1>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-primary-foreground/80">
+        <div className="flex items-center gap-2 lg:gap-4">
+          <span className="hidden sm:block text-sm text-primary-foreground/80 truncate max-w-[120px] lg:max-w-none">
             {user?.psicologoNombre || user?.username}
           </span>
           <button
@@ -151,12 +151,12 @@ export default function Dashboard() {
             className="flex items-center gap-1 text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors"
           >
             <LogOut className="h-4 w-4" />
-            Salir
+            <span className="hidden sm:inline">Salir</span>
           </button>
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col items-center px-8 py-10">
+      <div className="flex-1 flex flex-col items-center px-4 lg:px-8 py-6 lg:py-10">
         <div className="w-full max-w-6xl">
           <h2 className="text-2xl font-extrabold text-foreground uppercase tracking-tight mb-1 text-center">
             Panel Principal
@@ -166,7 +166,7 @@ export default function Dashboard() {
           </p>
 
           {/* AccionCards */}
-          <div className={`grid gap-6 ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'}`}>
+          <div className={`grid gap-3 lg:gap-6 grid-cols-2 ${isAdmin ? 'sm:grid-cols-3 lg:grid-cols-5' : 'sm:grid-cols-2 lg:grid-cols-4'}`}>
             <AccionCard
               icon={FileText}
               title="Ver Informe"
@@ -235,13 +235,13 @@ export default function Dashboard() {
               </div>
 
               {loading ? (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-4 lg:gap-6">
                   <Skeleton className="h-64 w-full rounded-2xl" />
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
                     <Skeleton className="h-64 w-full rounded-2xl" />
                     <Skeleton className="h-64 w-full rounded-2xl" />
                   </div>
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
                     <Skeleton className="h-64 w-full rounded-2xl" />
                     <Skeleton className="h-64 w-full rounded-2xl" />
                   </div>
@@ -249,12 +249,12 @@ export default function Dashboard() {
               ) : (
                 <>
                   {/* ── Tab: Uso del AP (solo ADMIN) ────────────────── */}
-                  <TabsContent value="uso" className="flex flex-col gap-6">
-                    <div className="grid grid-cols-2 gap-6">
+                  <TabsContent value="uso" className="flex flex-col gap-4 lg:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
                       <div id="g-ses-mes"><GraficaSesionesPorMes data={sesionesPorMes} /></div>
                       <div id="g-ses-turno"><GraficaSesionesPorTurno data={sesionesPorTurno} /></div>
                     </div>
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
                       <div id="g-pac-psi"><GraficaPacientesPorPsicologo data={pacientesPorPsicologo} /></div>
                       <div id="g-ses-psi"><GraficaSesionesPorPsicologo data={sesionesPorPsicologo} /></div>
                     </div>
@@ -262,9 +262,9 @@ export default function Dashboard() {
                   </TabsContent>
 
                   {/* ── Tab: Casos Clínicos ─────────────────────────── */}
-                  <TabsContent value="casos" className="flex flex-col gap-6">
+                  <TabsContent value="casos" className="flex flex-col gap-4 lg:gap-6">
                     <div id="g-score"><GraficaScorePromedio data={scorePromedio} /></div>
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
                       <div id="g-gravedad"><GraficaGravedad data={gravedad} /></div>
                       <div id="g-tipologias"><GraficaTipologias data={tipologias} /></div>
                     </div>
@@ -272,13 +272,13 @@ export default function Dashboard() {
                   </TabsContent>
 
                   {/* ── Tab: Participantes ──────────────────────────── */}
-                  <TabsContent value="participantes" className="flex flex-col gap-6">
+                  <TabsContent value="participantes" className="flex flex-col gap-4 lg:gap-6">
                     <div id="g-nuevos-pac"><GraficaNuevosPacientesPorMes data={nuevosPacientesPorMes} /></div>
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
                       <div id="g-dist-genero"><GraficaDistribucionGenero data={distribucionGenero} /></div>
                       <div id="g-dist-edad"><GraficaDistribucionEdad data={distribucionEdad} /></div>
                     </div>
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
                       <div id="g-semestres"><GraficaSemestres data={semestres} /></div>
                       <div id="g-carrera"><GraficaParticipantesCarrera data={participantesCarrera} /></div>
                     </div>
