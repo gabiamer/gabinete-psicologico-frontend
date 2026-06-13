@@ -140,6 +140,7 @@ const DetalleSesion: React.FC = () => {
     edad: paciente?.edad || '',
     domicilio: paciente?.domicilio || '',
     estadoCivil: paciente?.estadoCivil || 1,
+    genero: paciente?.genero || '',
     semestre: sesion.pacienteUniversitario?.semestre || 1,
     derivadoPor: sesion.pacienteUniversitario?.derivadoPor || '',
     psicologoId: sesion.psicologo?.id || ''

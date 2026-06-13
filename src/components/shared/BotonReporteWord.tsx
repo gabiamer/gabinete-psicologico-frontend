@@ -15,7 +15,6 @@ import Docxtemplater from "docxtemplater";
 import ImageModule from "docxtemplater-image-module-free";
 import { saveAs } from "file-saver";
 import { dashboardService } from "@/services/dashboardService";
-import type { EntrevistaRow } from "@/services/dashboardService";
 import { actividadService } from "@/services/actividadService";
 import { useAuth } from "@/contexts/AuthContext";
 

@@ -76,6 +76,7 @@ interface EditDatosForm {
   edad: number | ""
   domicilio: string
   estadoCivil: number | ""
+  genero: number | ""
   semestre: number | ""
   derivadoPor: string
   psicologoId: number | ""
@@ -150,7 +151,7 @@ export default function HistorialPaciente() {
   const [editDatosForm, setEditDatosForm] = useState<EditDatosForm>({
     primerNombre: "", segundoNombre: "", apellidoPaterno: "", apellidoMaterno: "",
     celular: "", fechaNacimiento: "", edad: "", domicilio: "",
-    estadoCivil: "", semestre: "", derivadoPor: "", psicologoId: "",
+    estadoCivil: "", genero: "", semestre: "", derivadoPor: "", psicologoId: "",
   })
   const [psicologos, setPsicologos] = useState<Psicologo[]>([])
   const [savingDatos, setSavingDatos] = useState(false)
@@ -257,6 +258,7 @@ export default function HistorialPaciente() {
       edad: p.edad ?? "",
       domicilio: p.domicilio ?? "",
       estadoCivil: p.estadoCivil ?? "",
+      genero: p.genero ?? "",
       semestre: paciente.semestre ?? "",
       derivadoPor: paciente.derivadoPor ?? "",
       psicologoId: paciente.psicologo?.id ?? "",
@@ -277,6 +279,7 @@ export default function HistorialPaciente() {
         edad: editDatosForm.edad,
         domicilio: editDatosForm.domicilio,
         estadoCivil: editDatosForm.estadoCivil as number,
+        genero: editDatosForm.genero,
         semestre: editDatosForm.semestre as number,
         derivadoPor: editDatosForm.derivadoPor,
         psicologoId: editDatosForm.psicologoId,
@@ -594,7 +597,7 @@ export default function HistorialPaciente() {
               ) : (
                 <div className="flex flex-col gap-3">
                   {sesionesOrdenadas.map((sesion, index) => {
-                    const nro = getNumeroSesion(sesion, sesionesOrdenadas.length - index)
+                    const nro = getNumeroSesion(sesion, sesionesOrdenadas.length - index) as string | number
                     return (
                       <div
                         key={sesion.id as string}

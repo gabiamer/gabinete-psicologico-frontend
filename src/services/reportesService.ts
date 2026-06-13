@@ -16,6 +16,9 @@ export interface SemestreRow        { semestre: string; total: number }
 export interface NuevosPacientesPorMesRow { mes: string; universitarios: number; externos: number }
 export interface DistribucionGeneroRow { genero: string; total: number }
 export interface DistribucionEdadRow   { rango: string; total: number }
+export interface HorasEjecutadasVsDesignadasRow { mes: string; designadas: number; ejecutadas: number }
+export interface HorasGeneroRow   { mes: string; mujeres: number; varones: number }
+export interface HorasTurnoRow    { mes: string; designadas_manana: number; designadas_tarde: number; ejecutadas_manana: number; ejecutadas_tarde: number }
 
 export interface HorasDesignadasInput {
   psicologoId: number; anio: number; mes: number; turno: 'manana' | 'tarde'; horas: number;
