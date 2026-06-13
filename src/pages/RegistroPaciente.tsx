@@ -197,6 +197,12 @@ const RegistroPaciente: React.FC = () => {
   const getTitulo = () => ['Registro de Paciente', 'Entrevista Inicial', 'Historia Familiar', 'Evaluación de Sintomatologías', 'Socialización y Hábitos', 'Historia Clínica', 'Acuerdos y Compromisos', 'Evaluación y Cierre'][paso - 1];
   const getSubtitulo = () => ['Ficha de Identificación General', 'Antecedentes y Motivo de Consulta', 'Datos de la Familia', 'Evaluación de Estrés, Ansiedad y Depresión', 'Vida Universitaria y Aspectos de Salud', 'Registro Clínico del Paciente', 'Compromisos y Seguimiento', 'Gravedad y Clasificación del Caso'][paso - 1];
 
+  const btnCancelar = () => (
+    <button type="button" onClick={() => navigate('/')} className="btn-cancel">
+      Cancelar
+    </button>
+  );
+
   const btnVolver = (destino: 1|2|3|4|5|6|7|8) => (
     <button type="button" onClick={() => { setPaso(destino); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="btn-submit" style={{ backgroundColor: '#64748b' }}>
       Volver
@@ -234,9 +240,7 @@ const RegistroPaciente: React.FC = () => {
               disablePsicologo={!isAdmin && !!user?.psicologoId}
             />
             <div className="actions-footer">
-              <button type="button" className="btn-back-dashboard" onClick={() => navigate('/')}>
-                ← Volver al Dashboard
-              </button>
+              {btnCancelar()}
               <button type="submit" className="btn-submit">
                 Continuar
               </button>
@@ -253,7 +257,7 @@ const RegistroPaciente: React.FC = () => {
             avanzar(e, 3);
           }} className="form-content" noValidate>
             <FormAntecedentes antecedentes={antecedentes} handleChange={handleChangeStep2} />
-            <div className="actions-footer">{btnVolver(1)}<button type="submit" className="btn-submit">Siguiente</button></div>
+            <div className="actions-footer">{btnCancelar()}{btnVolver(1)}<button type="submit" className="btn-submit">Siguiente</button></div>
           </form>
         )}
 
@@ -261,7 +265,7 @@ const RegistroPaciente: React.FC = () => {
         {paso === 3 && (
           <form onSubmit={(e) => avanzar(e, 4)} className="form-content" noValidate>
             <FormHistoriaFamiliar antecedentes={antecedentes} handleChange={handleChangeStep2} />
-            <div className="actions-footer">{btnVolver(2)}<button type="submit" className="btn-submit">Continuar</button></div>
+            <div className="actions-footer">{btnCancelar()}{btnVolver(2)}<button type="submit" className="btn-submit">Continuar</button></div>
           </form>
         )}
 
@@ -269,7 +273,7 @@ const RegistroPaciente: React.FC = () => {
         {paso === 4 && (
           <form onSubmit={(e) => avanzar(e, 5)} className="form-content" noValidate>
             <FormSintomatologia sintomatologias={sintomatologias} handleChangeSintoma={handleChangeSintoma} />
-            <div className="actions-footer">{btnVolver(3)}<button type="submit" className="btn-submit">Continuar</button></div>
+            <div className="actions-footer">{btnCancelar()}{btnVolver(3)}<button type="submit" className="btn-submit">Continuar</button></div>
           </form>
         )}
 
@@ -281,7 +285,7 @@ const RegistroPaciente: React.FC = () => {
               setAntecedentes={setAntecedentes}
               handleChange={handleChangeStep2}
             />
-            <div className="actions-footer">{btnVolver(4)}<button type="submit" className="btn-submit">Continuar</button></div>
+            <div className="actions-footer">{btnCancelar()}{btnVolver(4)}<button type="submit" className="btn-submit">Continuar</button></div>
           </form>
         )}
 
@@ -289,7 +293,7 @@ const RegistroPaciente: React.FC = () => {
         {paso === 6 && (
           <form onSubmit={(e) => avanzar(e, 7)} className="form-content" noValidate>
             <FormHistoriaClinica antecedentes={antecedentes} handleChange={handleChangeStep2} />
-            <div className="actions-footer">{btnVolver(5)}<button type="submit" className="btn-submit">Continuar</button></div>
+            <div className="actions-footer">{btnCancelar()}{btnVolver(5)}<button type="submit" className="btn-submit">Continuar</button></div>
           </form>
         )}
 
@@ -300,7 +304,7 @@ const RegistroPaciente: React.FC = () => {
               formData={formData} antecedentes={antecedentes}
               sintomatologias={sintomatologias} handleChange={handleChangeStep2}
             />
-            <div className="actions-footer">{btnVolver(6)}<button type="submit" className="btn-submit">Continuar</button></div>
+            <div className="actions-footer">{btnCancelar()}{btnVolver(6)}<button type="submit" className="btn-submit">Continuar</button></div>
           </form>
         )}
 
@@ -309,6 +313,7 @@ const RegistroPaciente: React.FC = () => {
           <form onSubmit={handleSubmitFinal} className="form-content" noValidate>
             <FormEvaluacion antecedentes={antecedentes} setAntecedentes={setAntecedentes} />
             <div className="actions-footer">
+              {btnCancelar()}
               {btnVolver(7)}
               <button type="submit" disabled={loading || submitting} className="btn-submit">
                 {loading ? 'Finalizando...' : '✓ Finalizar y Guardar'}

@@ -63,6 +63,11 @@ export const dashboardService = {
     return response.data.data || [];
   },
 
+  obtenerOrientacionesPeriodo: async (desde: string, hasta: string): Promise<OrientacionRow[]> => {
+    const response = await api.get('/dashboard/orientaciones-periodo', { params: { desde, hasta } });
+    return response.data.data || [];
+  },
+
   obtenerEstadisticas: async (): Promise<DashboardStats> => {
     const response = await api.get('/dashboard/stats');
     return response.data.data;

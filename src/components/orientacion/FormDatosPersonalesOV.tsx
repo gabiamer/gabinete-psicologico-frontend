@@ -6,20 +6,23 @@ import type { OrientacionVocacionalData, FormData } from '../../types/types';
 interface Props {
     formData: FormData;
     orientacion: OrientacionVocacionalData;
+    escuela?: string;
     handleChangeFormData: (
         e: React.ChangeEvent<
             HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
         >
     ) => void;
-
     handleChangeOrientacion: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    onEscuelaChange?: (value: string) => void;
 }
 
 export const FormDatosPersonalesOV: React.FC<Props> = ({
     formData,
     orientacion,
+    escuela,
     handleChangeFormData,
-    handleChangeOrientacion
+    handleChangeOrientacion,
+    onEscuelaChange,
 }) => {
     return (
         <>
@@ -82,15 +85,24 @@ export const FormDatosPersonalesOV: React.FC<Props> = ({
                         />
                     </FormField>
 
-                    <FormField label="Escuela">
-                        <input
-                            type="text"
-                            name="derivadoPor"
-                            value={formData.derivadoPor}
-                            onChange={handleChangeFormData}
-                            className="input-academic"
-                            placeholder="Nombre de la escuela o colegio"
-                        />
+                    <FormField label="Escuela / Colegio">
+                        {onEscuelaChange ? (
+                            <input
+                                type="text"
+                                value={escuela ?? ''}
+                                onChange={(e) => onEscuelaChange(e.target.value)}
+                                className="input-academic"
+                                placeholder="Nombre de la escuela o colegio"
+                            />
+                        ) : (
+                            <input
+                                type="text"
+                                value={escuela ?? ''}
+                                readOnly
+                                className="input-academic"
+                                style={{ backgroundColor: '#f1f5f9', cursor: 'not-allowed' }}
+                            />
+                        )}
                     </FormField>
 
                     <FormField label="Año que cursa" required>

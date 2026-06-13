@@ -61,10 +61,6 @@ const RegistroPacienteExterno: React.FC = () => {
       setError('La fecha de nacimiento es obligatoria');
       return false;
     }
-    if (!escuela.trim()) {
-      setError('La escuela es obligatoria');
-      return false;
-    }
     return true;
   };
 
@@ -216,7 +212,7 @@ const RegistroPacienteExterno: React.FC = () => {
             </div>
 
             <div className="grid-2-cols">
-              <FormField label="Escuela / Colegio" required>
+              <FormField label="Escuela / Colegio">
                 <input
                   type="text"
                   value={escuela}
@@ -244,8 +240,7 @@ const RegistroPacienteExterno: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="btn-submit"
-              style={{ backgroundColor: '#64748b' }}
+              className="btn-cancel"
             >
               Cancelar
             </button>

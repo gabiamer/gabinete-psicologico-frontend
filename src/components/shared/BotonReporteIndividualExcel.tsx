@@ -1,12 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { FileDown, Loader2 } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { FileDown, Loader2, CalendarRange } from "lucide-react"
 import PizZip from "pizzip"
 import Docxtemplater from "docxtemplater"
 import { saveAs } from "file-saver"
-import { pacienteService } from "@/services/pacienteService"
-import { sesionService } from "@/services/sesionService"
-import { dashboardService } from "@/services/dashboardService"
+import api from "@/services/api"
 
 // ── Mapas ─────────────────────────────────────────────────────────────────────
 const GENERO_MAP: Record<number, string> = { 1: "Masculino", 2: "Femenino", 3: "Otro" }
@@ -20,7 +28,6 @@ function parse(val: unknown): Record<string, any> {
   return val as Record<string, any>
 }
 
-// Limpia comillas escapadas que vienen del backend (e.g. "\"texto\"" → "texto")
 function limpiar(val: unknown): string {
   if (val == null) return ""
   const s = String(val).trim()
@@ -35,27 +42,29 @@ function formatFecha(iso: string | null | undefined): string {
 }
 
 export function BotonReporteIndividualExcel({ pacienteId }: { pacienteId: number }) {
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [generando, setGenerando] = useState(false)
+
+  const hoy = new Date()
+  const primerDiaAnio = `${hoy.getFullYear()}-01-01`
+  const hoyStr = hoy.toISOString().split("T")[0]
+
+  const [fechaDesde, setFechaDesde] = useState(primerDiaAnio)
+  const [fechaHasta, setFechaHasta] = useState(hoyStr)
 
   const generarDocumento = async () => {
     try {
       setGenerando(true)
 
-      // 1. Obtener datos del paciente, lista de sesiones y entrevistas del dashboard
-      const [pacienteRaw, sesionesRaw, todasEntrevistas] = await Promise.all([
-        pacienteService.obtenerPorId(pacienteId),
-        sesionService.obtenerPorPaciente(pacienteId),
-        dashboardService.obtenerEntrevistas(),
-      ])
+      // Una sola llamada al endpoint unificado
+      const res = await api.get(`/pacientes/universitario/${pacienteId}/reporte`, {
+        params: { desde: fechaDesde, hasta: fechaHasta },
+      })
+      const { pacienteUniversitario: pu, entrevista: primeraEntrevista, sesiones } = res.data.data as any
 
-      const pac = pacienteRaw as any
-      const sesiones: any[] = Array.isArray(sesionesRaw) ? sesionesRaw : []
-
-      const entrevistaRow = todasEntrevistas.find((e) => e.pacienteUniversitarioId === pacienteId)
-      const carreraStr = entrevistaRow?.carrera ?? ""
-
-      // 2. Datos personales
-      const person = pac.paciente?.person ?? {}
+      // Datos personales
+      const pac = pu.paciente ?? {}
+      const person = pac.person ?? {}
       const nombreCompleto = [
         person.primerNombre,
         person.segundoNombre,
@@ -63,24 +72,22 @@ export function BotonReporteIndividualExcel({ pacienteId }: { pacienteId: number
         person.apellidoMaterno,
       ].filter(Boolean).join(" ")
 
-      const psicologo = pac.psicologo
+      const psicologo = pu.psicologo
       const psicologoNombre = psicologo
         ? `${psicologo.person?.primerNombre ?? ""} ${psicologo.person?.apellidoPaterno ?? ""}`.trim()
         : ""
 
-      // 3. Fetchear todas las sesiones individualmente (la lista no incluye entrevista ni historialClinico)
-      const sesionesCompletas: any[] = await Promise.all(
-        sesiones.map((s: any) => sesionService.obtenerPorId(s.id))
-      )
+      // Obtener carrera desde la entrevista del paciente (endpoint de entrevistas globales)
+      // ya que el endpoint de reporte no incluye carrera directamente
+      let carreraStr = ""
+      try {
+        const entRes = await api.get("/dashboard/entrevistas")
+        const filas: any[] = entRes.data.data ?? []
+        const fila = filas.find((e: any) => e.pacienteUniversitarioId === pacienteId)
+        carreraStr = fila?.carrera ?? ""
+      } catch { /* si falla, se deja vacío */ }
 
-      // Ordenar por fecha ascendente — la primera tiene la entrevista
-      sesionesCompletas.sort(
-        (a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
-      )
-
-      const primeraEntrevista: any =
-        sesionesCompletas.find((s) => s.entrevista)?.entrevista ?? null
-
+      // Datos de la entrevista
       const familia     = parse(primeraEntrevista?.historiaFamiliar)
       const universidad = parse(primeraEntrevista?.relatoUniversidad)
       const habitos     = parse(primeraEntrevista?.habitos)
@@ -98,7 +105,6 @@ export function BotonReporteIndividualExcel({ pacienteId }: { pacienteId: number
       const ansiedad  = (sintomasRaw.ansiedad  as number[]) ?? Array(12).fill(0)
       const depresion = (sintomasRaw.depresion as number[]) ?? Array(12).fill(0)
 
-      // 4. Tags individuales para la tabla de sintomas (12 celdas por columna)
       const sintomasFlat: Record<string, string | number> = {}
       for (let i = 0; i < 12; i++) {
         sintomasFlat[`estres_${i + 1}`]    = estres[i]    ?? ""
@@ -106,8 +112,8 @@ export function BotonReporteIndividualExcel({ pacienteId }: { pacienteId: number
         sintomasFlat[`depresion_${i + 1}`] = depresion[i] ?? ""
       }
 
-      // 5. Historial clínico (todas las sesiones con historialClinico)
-      const sesionesConHistorial = sesionesCompletas
+      // Historial clínico desde las sesiones ya filtradas por rango
+      const sesionesConHistorial = (sesiones as any[])
         .filter((s) => s.historialClinico)
         .sort((a, b) => (a.historialClinico?.nroSesion ?? 0) - (b.historialClinico?.nroSesion ?? 0))
         .map((s) => {
@@ -125,37 +131,34 @@ export function BotonReporteIndividualExcel({ pacienteId }: { pacienteId: number
           }
         })
 
-      // 6. Cargar la plantilla
+      // Cargar plantilla
       const response = await fetch("/plantilla_entrevista.docx")
       if (!response.ok) throw new Error("No se pudo cargar la plantilla")
       const arrayBuffer = await response.arrayBuffer()
 
-      // 7. Inicializar docxtemplater
       const zip = new PizZip(arrayBuffer)
-      const doc = new Docxtemplater(zip, {
-        paragraphLoop: true,
-        linebreaks: true,
+      const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true })
+
+      const fechaGeneracion = new Date().toLocaleDateString("es-ES", {
+        day: "2-digit", month: "2-digit", year: "numeric",
       })
 
-      // 8. Inyectar todos los datos
       doc.render({
-        // Datos personales
+        fecha_generacion: fechaGeneracion,
         nombre_completo:  nombreCompleto,
-        edad:             pac.paciente?.edad ?? "",
-        genero:           pac.paciente?.genero != null ? GENERO_MAP[pac.paciente.genero] : "",
-        domicilio:        pac.paciente?.domicilio ?? "",
-        fecha_nacimiento: formatFecha(pac.paciente?.fechaNacimiento),
-        estado_civil:     pac.paciente?.estadoCivil != null ? ESTADO_CIVIL_MAP[pac.paciente.estadoCivil] : "",
+        edad:             pac.edad ?? "",
+        genero:           pac.genero != null ? GENERO_MAP[pac.genero] : "",
+        domicilio:        pac.domicilio ?? "",
+        fecha_nacimiento: formatFecha(pac.fechaNacimiento),
+        estado_civil:     pac.estadoCivil != null ? ESTADO_CIVIL_MAP[pac.estadoCivil] : "",
         celular:          person.celular ?? "",
-        semestre:         pac.semestre ?? "",
+        semestre:         pu.semestre ?? "",
         carrera:          carreraStr,
-        remitido_por:     pac.derivadoPor ?? "",
+        remitido_por:     pu.derivadoPor ?? "",
         psicologo_nombre: psicologoNombre,
 
-        // Motivo de consulta
         motivo_consulta: limpiar(primeraEntrevista?.antecedentes),
 
-        // Historia familiar
         con_quien_vive:      limpiar(familia.conQuienVive),
         persona_referencia:  limpiar(familia.personaReferencia),
         celular_referencia:  limpiar(familia.celularReferencia),
@@ -172,39 +175,34 @@ export function BotonReporteIndividualExcel({ pacienteId }: { pacienteId: number
         numero_hermanos:     limpiar(hermanos.numero),
         relacion_hermanos:   limpiar(hermanos.relato),
 
-        // Sintomatologías (etiquetas individuales por celda)
         ...sintomasFlat,
         total_estres:    primeraEntrevista?.totalScoreEstres    ?? "",
         total_ansiedad:  primeraEntrevista?.totalScoreAnsiedad  ?? "",
         total_depresion: primeraEntrevista?.totalScoreDepresion ?? "",
 
-        // Relato universidad
         relato_universidad: limpiar(universidad.relatoGeneral),
         cambio_carreras:    limpiar(universidad.cambioCarreras),
         motivos_cambio:     limpiar(universidad.motivosCambio),
 
-        // Hábitos
         consumo_alcohol:  alcohol.frecuencia ?? "",
         consumo_tabaco:   tabaco.frecuencia ?? "",
         consumo_drogas:   drogas.frecuencia ?? "",
         relato_acusacion: limpiar(habitos.relatoAcusacionDetencion),
 
-        // Acuerdos
         acuerdos:              limpiar(acuerdos.acuerdosEstablecidos),
         proxima_sesion_fecha:  limpiar(acuerdos.proximaSesionFecha),
         proxima_sesion_hora:   limpiar(acuerdos.proximaSesionHora),
 
-        // Historial clínico (loop)
         sesiones: sesionesConHistorial,
       })
 
-      // 9. Descargar
       const blob = doc.getZip().generate({
         type: "blob",
         mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       })
 
       saveAs(blob, `Entrevista_${nombreCompleto.replace(/ /g, "_")}.docx`)
+      setDialogOpen(false)
 
     } catch (error) {
       console.error("Error al generar el informe:", error)
@@ -215,15 +213,65 @@ export function BotonReporteIndividualExcel({ pacienteId }: { pacienteId: number
   }
 
   return (
-    <Button
-      onClick={generarDocumento}
-      disabled={generando}
-      className="bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-colors"
-    >
-      {generando
-        ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generando...</>
-        : <><FileDown className="h-4 w-4 mr-2" /> Descargar Historial Clínico</>
-      }
-    </Button>
+    <>
+      <Button
+        onClick={() => setDialogOpen(true)}
+        className="bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-colors"
+      >
+        <FileDown className="h-4 w-4 mr-2" />
+        Descargar Historial Clínico
+      </Button>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarRange className="h-5 w-5 text-blue-600" />
+              Seleccionar Periodo
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4 py-2">
+            <div className="flex flex-col gap-1.5">
+              <Label>Fecha desde</Label>
+              <Input
+                type="date"
+                value={fechaDesde}
+                onChange={(e) => setFechaDesde(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label>Fecha hasta</Label>
+              <Input
+                type="date"
+                value={fechaHasta}
+                onChange={(e) => setFechaHasta(e.target.value)}
+                min={fechaDesde}
+              />
+            </div>
+            <p className="text-xs text-slate-500">
+              Solo se incluirán las sesiones dentro del periodo seleccionado.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={generando}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={generarDocumento}
+              disabled={generando || !fechaDesde || !fechaHasta}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {generando ? (
+                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generando...</>
+              ) : (
+                <><FileDown className="h-4 w-4 mr-2" /> Generar</>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

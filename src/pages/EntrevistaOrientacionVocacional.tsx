@@ -24,9 +24,19 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
     const esNuevoPaciente = !id && !!nuevoPacienteState;
     const [paso, setPaso] = useState<1 | 2 | 3>(1);
     const [, setPacienteCargado] = useState(false);
+    const [escuela, setEscuela] = useState<string>(nuevoPacienteState?.escuela ?? '');
 
-    const [formData, setFormData] = useState<FormData>(
-        nuevoPacienteState?.formData ?? {
+    const [formData, setFormData] = useState<FormData>(() => {
+        if (nuevoPacienteState?.formData) {
+            return {
+                ...nuevoPacienteState.formData,
+                // correo viene como estado separado en RegistroPacienteExterno — mapearlo aquí
+                celular: nuevoPacienteState.correo ?? nuevoPacienteState.formData.celular,
+                // anio también viene separado
+                semestre: nuevoPacienteState.anio ?? nuevoPacienteState.formData.semestre,
+            };
+        }
+        return {
             primerNombre: '',
             segundoNombre: '',
             apellidoPaterno: '',
@@ -40,8 +50,8 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
             semestre: 1,
             derivadoPor: '',
             psicologoId: ''
-        }
-    );
+        };
+    });
 
     const [orientacion, setOrientacion] = useState<OrientacionVocacionalData>({
         motivoConsulta: '',
@@ -112,10 +122,12 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
                 edad: data.paciente?.edad || '',
                 domicilio: data.paciente?.domicilio || '',
                 estadoCivil: data.paciente?.estadoCivil || 1,
+                genero: data.paciente?.genero ?? '',
                 semestre: data.anio || 1,
-                derivadoPor: data.escuela || '', 
+                derivadoPor: '',
                 psicologoId: ''
             });
+            setEscuela(data.escuela || '');
             setPacienteCargado(true);
         } catch (err) {
             console.error('Error cargando paciente:', err);
@@ -288,11 +300,13 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
                         <FormDatosPersonalesOV
                             formData={formData}
                             orientacion={orientacion}
+                            escuela={escuela}
+                            onEscuelaChange={esNuevoPaciente ? undefined : setEscuela}
                             handleChangeFormData={handleChangeFormData}
                             handleChangeOrientacion={handleChangeOrientacion}
                         />
                         <div className="actions-footer">
-                            <button type="button" onClick={() => navigate(-1)} className="btn-submit" style={{ backgroundColor: '#64748b' }}>
+                            <button type="button" onClick={() => navigate('/')} className="btn-cancel">
                                 Cancelar
                             </button>
                             <button type="submit" className="btn-submit">
@@ -309,6 +323,9 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
                             handleChange={handleChangeOrientacion}
                         />
                         <div className="actions-footer">
+                            <button type="button" onClick={() => navigate('/')} className="btn-cancel">
+                                Cancelar
+                            </button>
                             <button type="button" onClick={() => setPaso(1)} className="btn-submit" style={{ backgroundColor: '#64748b' }}>
                                 Volver
                             </button>
@@ -326,6 +343,9 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
                             handleChange={handleChangeOrientacion}
                         />
                         <div className="actions-footer">
+                            <button type="button" onClick={() => navigate('/')} className="btn-cancel">
+                                Cancelar
+                            </button>
                             <button type="button" onClick={() => setPaso(2)} className="btn-submit" style={{ backgroundColor: '#64748b' }}>
                                 Volver
                             </button>

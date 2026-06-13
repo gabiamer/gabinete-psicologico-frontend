@@ -62,10 +62,10 @@ export function BotonReporteWord() {
     try {
       setGenerando(true);
 
-      // 1. Obtener datos: entrevistas ya filtradas por período en el backend
-      const [entrevistas, stats, actividadesRango] = await Promise.all([
+      // 1. Obtener datos: entrevistas y orientaciones ya filtradas por período en el backend
+      const [entrevistas, orientaciones, actividadesRango] = await Promise.all([
         dashboardService.obtenerEntrevistasPeriodo(fechaDesde, fechaHasta),
-        dashboardService.obtenerEstadisticas(),
+        dashboardService.obtenerOrientacionesPeriodo(fechaDesde, fechaHasta),
         actividadService.getByRango(fechaDesde, fechaHasta),
       ]);
 
@@ -191,7 +191,7 @@ export function BotonReporteWord() {
         mes_anio: mesAnio,
         rango_fechas: rangoFechas,
         total_universitarios: entrevistas.length,
-        total_externos: stats.totalPacientesExternos,
+        total_externos: orientaciones.length,
         total_sesiones: totalSesionesPeriodo,
         total_acompanamiento: situacionCount["Acompañamiento psicológico"],
         total_buen_proceso: situacionCount["Buen proceso"],

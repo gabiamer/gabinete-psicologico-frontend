@@ -48,11 +48,11 @@ export default function OrientacionesTable({
             <TableHead className="font-bold text-xs uppercase text-slate-600 w-16">Nro</TableHead>
             <TableHead className="font-bold text-xs uppercase text-slate-600">Estudiante</TableHead>
             <TableHead className="font-bold text-xs uppercase text-slate-600">Escuela</TableHead>
-            <TableHead className="font-bold text-xs uppercase text-slate-600 text-center">Anio</TableHead>
+            <TableHead className="font-bold text-xs uppercase text-slate-600 text-center">Año</TableHead>
             <TableHead className="font-bold text-xs uppercase text-slate-600 text-center">Edad</TableHead>
             <TableHead className="font-bold text-xs uppercase text-slate-600">Correo</TableHead>
             <TableHead className="font-bold text-xs uppercase text-slate-600 text-center">Entrevistas</TableHead>
-            <TableHead className="font-bold text-xs uppercase text-slate-600">Ultima Fecha</TableHead>
+            <TableHead className="font-bold text-xs uppercase text-slate-600">Última Fecha</TableHead>
             <TableHead className="font-bold text-xs uppercase text-slate-600 w-16"></TableHead>
           </TableRow>
         </TableHeader>
@@ -99,7 +99,7 @@ export default function OrientacionesTable({
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onNuevaOrientacion(row.pacienteExternoId)}>
                       <FilePlus className="h-4 w-4 mr-2" />
-                      Nueva Orientacion
+                      Nueva Orientación
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
