@@ -4,9 +4,21 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { pacienteService } from '../services/pacienteService';
 import { sesionService } from '../services/sesionService';
 import { FormField } from '../components/shared/FormField';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
 import './RegistroPaciente.css';
 
 const TIPOLOGIAS = ['Estrés', 'Baja autoestima', 'Ansiedad', 'Depresión', 'Problemas familiares', 'Problemas académicos'];
+
+const GRAVEDAD_OPTIONS = [
+  { valor: 'leve',     label: 'Leve',                    color: '#10b981' },
+  { valor: 'moderado', label: 'Moderado',                 color: '#f59e0b' },
+  { valor: 'grave',    label: 'Grave (Revisión Externa)', color: '#ef4444' },
+];
 
 /** Hora actual en zona horaria de Bolivia (UTC-4) en formato HH:mm:ss */
 function horaBolivia(): string {
@@ -53,9 +65,7 @@ const NuevaSesion: React.FC = () => {
 
   const toggleTipologia = (tipologia: string) => {
     setTipologias(prev =>
-      prev.includes(tipologia)
-        ? prev.filter(t => t !== tipologia)
-        : [...prev, tipologia]
+      prev.includes(tipologia) ? prev.filter(t => t !== tipologia) : [...prev, tipologia]
     );
   };
 
@@ -70,23 +80,14 @@ const NuevaSesion: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     const horaFin = horaBolivia();
-
     try {
-      const sesionData = {
+      await sesionService.crear(Number(id), {
         fecha: `${fecha}T${hora}:00`,
         horaInicio: horaInicioRef,
         horaFin,
-        historialClinico: {
-          nroSesion: numeroSesion,
-          historia: notas,
-          gravedad: gravedad,
-          tipologias: tipologias,
-        },
-      };
-
-      await sesionService.crear(Number(id), sesionData);
+        historialClinico: { nroSesion: numeroSesion, historia: notas, gravedad, tipologias },
+      });
       await new Promise(resolve => setTimeout(resolve, 500));
       navigate(`/pacientes/${id}/historial`, { replace: true });
     } catch (err: any) {
@@ -100,7 +101,7 @@ const NuevaSesion: React.FC = () => {
     return (
       <div className="registro-wrapper">
         <div className="card-academic">
-          <p style={{ textAlign: 'center', padding: '40px' }}>Cargando...</p>
+          <p className="text-center p-10 text-muted-foreground">Cargando...</p>
         </div>
       </div>
     );
@@ -116,7 +117,11 @@ const NuevaSesion: React.FC = () => {
           </p>
         </header>
 
-        {error && <div className="alert alert-error">{error}</div>}
+        {error && (
+          <Alert variant="destructive" className="mx-10 mt-5">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit} className="form-content">
 
@@ -126,25 +131,12 @@ const NuevaSesion: React.FC = () => {
               <span className="section-number">📝</span>
               <span className="section-text">Datos de la Sesión</span>
             </div>
-
             <div className="grid-2-cols">
               <FormField label="Fecha" required>
-                <input
-                  type="date"
-                  value={fecha}
-                  onChange={(e) => setFecha(e.target.value)}
-                  className="input-academic"
-                  max={new Date().toISOString().split('T')[0]}
-                />
+                <Input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
               </FormField>
-
               <FormField label="Hora (referencia)">
-                <input
-                  type="time"
-                  value={hora}
-                  onChange={(e) => setHora(e.target.value)}
-                  className="input-academic"
-                />
+                <Input type="time" value={hora} onChange={(e) => setHora(e.target.value)} />
               </FormField>
             </div>
           </section>
@@ -155,14 +147,13 @@ const NuevaSesion: React.FC = () => {
               <span className="section-number">📋</span>
               <span className="section-text">Historia Clínica</span>
             </div>
-
             <FormField label="Historia Clínica">
-              <textarea
+              <Textarea
                 value={notas}
                 onChange={(e) => setNotas(e.target.value)}
-                className="textarea-academic"
                 rows={10}
                 placeholder="Escriba aquí el contenido de la sesión..."
+                className="resize-y"
               />
             </FormField>
           </section>
@@ -173,36 +164,25 @@ const NuevaSesion: React.FC = () => {
               <span className="section-number">⚠️</span>
               <span className="section-text">Gravedad</span>
             </div>
-
-            <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
-              {[
-                { valor: 'leve', label: 'Leve', color: '#10b981' },
-                { valor: 'moderado', label: 'Moderado', color: '#f59e0b' },
-                { valor: 'grave', label: 'Grave (Revisión Externa)', color: '#ef4444' }
-              ].map(({ valor, label, color }) => (
+            <div className="flex gap-4 mt-4">
+              {GRAVEDAD_OPTIONS.map(({ valor, label, color }) => (
                 <label
                   key={valor}
-                  style={{
-                    flex: 1,
-                    padding: '16px',
-                    border: `3px solid ${gravedad === valor ? color : '#e2e8f0'}`,
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    textAlign: 'center',
-                    fontWeight: '600',
-                    backgroundColor: gravedad === valor ? `${color}20` : '#ffffff',
-                    transition: 'all 0.2s'
-                  }}
+                  className={cn(
+                    'flex-1 p-4 rounded-lg border-2 text-center font-semibold cursor-pointer transition-all text-sm',
+                    gravedad === valor ? 'border-current' : 'border-border bg-background hover:border-muted-foreground/40'
+                  )}
+                  style={gravedad === valor ? { borderColor: color, backgroundColor: `${color}20` } : {}}
                 >
                   <input
                     type="radio"
                     name="gravedad"
                     value={valor}
                     checked={gravedad === valor}
-                    onChange={(e) => setGravedad(e.target.value as any)}
-                    style={{ marginRight: '8px' }}
+                    onChange={(e) => setGravedad(e.target.value as 'leve' | 'moderado' | 'grave')}
+                    className="sr-only"
                   />
-                  {label}
+                  <span style={{ color: gravedad === valor ? color : undefined }}>{label}</span>
                 </label>
               ))}
             </div>
@@ -215,85 +195,56 @@ const NuevaSesion: React.FC = () => {
               <span className="section-text">Tipología</span>
             </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
-              {TIPOLOGIAS.map((tipo) => (
-                <label
-                  key={tipo}
-                  style={{
-                    padding: '12px 20px',
-                    border: `2px solid ${tipologias.includes(tipo) ? '#3b82f6' : '#e2e8f0'}`,
-                    borderRadius: '24px',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    backgroundColor: tipologias.includes(tipo) ? '#eff6ff' : '#ffffff',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={tipologias.includes(tipo)}
-                    onChange={() => toggleTipologia(tipo)}
-                    style={{ marginRight: '8px' }}
-                  />
-                  {tipo}
-                </label>
-              ))}
+            <div className="flex flex-wrap gap-3 mt-4">
+              {TIPOLOGIAS.map((tipo) => {
+                const activo = tipologias.includes(tipo);
+                return (
+                  <label
+                    key={tipo}
+                    className={cn(
+                      'flex items-center gap-2 px-5 py-2.5 rounded-full border-2 font-medium text-sm cursor-pointer transition-all',
+                      activo
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border bg-background text-foreground hover:border-primary/40'
+                    )}
+                  >
+                    <input type="checkbox" checked={activo} onChange={() => toggleTipologia(tipo)} className="sr-only" />
+                    {tipo}
+                  </label>
+                );
+              })}
             </div>
 
-            <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
-              <input
-                type="text"
+            <div className="flex gap-3 mt-6">
+              <Input
                 value={otraTipologia}
                 onChange={(e) => setOtraTipologia(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), agregarOtraTipologia())}
                 placeholder="Agregar otra tipología..."
-                className="input-academic"
-                style={{ flex: 1 }}
+                className="flex-1"
               />
-              <button
-                type="button"
-                onClick={agregarOtraTipologia}
-                className="btn-submit"
-                style={{ minWidth: '120px' }}
-              >
+              <Button type="button" onClick={agregarOtraTipologia} variant="secondary">
                 + Agregar
-              </button>
+              </Button>
             </div>
 
             {tipologias.filter(t => !TIPOLOGIAS.includes(t)).length > 0 && (
-              <div style={{ marginTop: '16px' }}>
-                <p style={{ fontWeight: '600', marginBottom: '8px', fontSize: '14px', color: '#64748b' }}>
+              <div className="mt-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">
                   Tipologías personalizadas:
                 </p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                <div className="flex flex-wrap gap-2">
                   {tipologias.filter(t => !TIPOLOGIAS.includes(t)).map((tipo) => (
-                    <span
-                      key={tipo}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: '#f1f5f9',
-                        borderRadius: '16px',
-                        fontSize: '14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}
-                    >
+                    <Badge key={tipo} variant="secondary" className="gap-2 pl-3 pr-2 py-1.5 text-sm">
                       {tipo}
                       <button
                         type="button"
                         onClick={() => setTipologias(prev => prev.filter(t => t !== tipo))}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#ef4444',
-                          cursor: 'pointer',
-                          fontWeight: 'bold'
-                        }}
+                        className="text-destructive hover:text-destructive/80 font-bold text-base leading-none"
                       >
                         ×
                       </button>
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               </div>
@@ -301,17 +252,12 @@ const NuevaSesion: React.FC = () => {
           </section>
 
           <div className="actions-footer">
-            <button
-              type="button"
-              onClick={() => navigate(`/pacientes/${id}/historial`)}
-              className="btn-submit"
-              style={{ backgroundColor: '#64748b' }}
-            >
+            <Button type="button" variant="secondary" onClick={() => navigate(`/pacientes/${id}/historial`)}>
               Cancelar
-            </button>
-            <button type="submit" disabled={loading} className="btn-submit">
+            </Button>
+            <Button type="submit" disabled={loading}>
               {loading ? 'Guardando...' : '✓ Guardar Sesión'}
-            </button>
+            </Button>
           </div>
 
         </form>

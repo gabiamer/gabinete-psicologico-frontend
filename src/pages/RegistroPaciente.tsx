@@ -13,6 +13,8 @@ import { FormUniversidad } from '../components/pacientes/FormUniversidad';
 import { FormHistoriaClinica } from '../components/pacientes/FormHistoriaClinica';
 import { FormAcuerdos } from '../components/pacientes/FormAcuerdos';
 import { FormEvaluacion } from '../components/pacientes/FormEvaluacion';
+import { FormField } from '../components/shared/FormField';
+import { Input } from '@/components/ui/input';
 import './RegistroPaciente.css';
 
 const PASOS = [
@@ -44,7 +46,8 @@ const RegistroPaciente: React.FC = () => {
     genero: '',
     semestre: 1,
     derivadoPor: '',
-    psicologoId: ''
+    psicologoId: '',
+    fechaRegistro: new Date().toISOString().split('T')[0]
   });
 
   const [antecedentes, setAntecedentes] = useState<AntecedentesData>({
@@ -239,6 +242,14 @@ const RegistroPaciente: React.FC = () => {
               handleChange={handleChangeStep1} seleccionarPsicologo={seleccionarPsicologo} setFormData={setFormData}
               disablePsicologo={!isAdmin && !!user?.psicologoId}
             />
+            <FormField label="Fecha de la Entrevista" required>
+              <Input
+                type="date"
+                name="fechaRegistro"
+                value={formData.fechaRegistro || ''}
+                onChange={handleChangeStep1}
+              />
+            </FormField>
             <div className="actions-footer">
               {btnCancelar()}
               <button type="submit" className="btn-submit">

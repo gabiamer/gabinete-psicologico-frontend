@@ -143,6 +143,7 @@ export const pacienteService = {
       derivadoPor: formData.derivadoPor,
       psicologoId: formData.psicologoId,
       carreraId: formData.carreraId,
+      fechaRegistro: formData.fechaRegistro || undefined,
       // Datos de la entrevista
       ...antecedentes,
       sintomas: sintomatologias,

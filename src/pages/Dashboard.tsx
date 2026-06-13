@@ -128,24 +128,27 @@ export default function Dashboard() {
   }, [rangoKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Top bar con branding */}
-      <header className="bg-[#0f172a] text-white px-8 py-4 flex-shrink-0 flex items-center justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-            UCB Tarija
-          </p>
-          <h1 className="text-lg font-extrabold uppercase tracking-tight">
-            Gabinete Psicologico
-          </h1>
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Top bar con branding UCB */}
+      <header className="bg-primary text-primary-foreground px-8 py-4 flex-shrink-0 flex items-center justify-between border-b-4 border-accent">
+        <div className="flex items-center gap-4">
+          <img src="/UCB LOGO.png" alt="UCB" className="h-10 object-contain" />
+          <div className="border-l border-white/30 pl-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary-foreground/60">
+              UCB Tarija
+            </p>
+            <h1 className="text-lg font-extrabold uppercase tracking-tight">
+              Gabinete Psicológico
+            </h1>
+          </div>
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-slate-300">
+          <span className="text-sm text-primary-foreground/80">
             {user?.psicologoNombre || user?.username}
           </span>
           <button
             onClick={() => { logout(); navigate('/login'); }}
-            className="flex items-center gap-1 text-sm text-slate-400 hover:text-white transition-colors"
+            className="flex items-center gap-1 text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors"
           >
             <LogOut className="h-4 w-4" />
             Salir
@@ -155,10 +158,10 @@ export default function Dashboard() {
 
       <div className="flex-1 flex flex-col items-center px-8 py-10">
         <div className="w-full max-w-6xl">
-          <h2 className="text-2xl font-extrabold text-slate-900 uppercase tracking-tight mb-1 text-center">
+          <h2 className="text-2xl font-extrabold text-foreground uppercase tracking-tight mb-1 text-center">
             Panel Principal
           </h2>
-          <p className="text-sm text-slate-500 mb-8 text-center">
+          <p className="text-sm text-muted-foreground mb-8 text-center">
             Seleccione una accion para comenzar
           </p>
 

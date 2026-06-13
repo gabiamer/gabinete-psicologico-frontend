@@ -164,7 +164,7 @@ export default function Informe() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Top bar con branding */}
-      <header className="bg-[#0f172a] text-white px-8 py-4 flex items-center justify-between flex-shrink-0">
+      <header className="bg-primary text-primary-foreground px-8 py-4 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/')}
@@ -179,7 +179,7 @@ export default function Informe() {
         </div>
 
         {/* Toggle switch Entrevistas / Orientaciones */}
-        <div className="flex items-center bg-slate-800 rounded-lg p-1 gap-1">
+        <div className="flex items-center bg-white/10 rounded-lg p-1 gap-1">
           <button
             onClick={() => setActiveTab('entrevistas')}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold transition-all ${
@@ -191,7 +191,7 @@ export default function Informe() {
             <Brain className="h-4 w-4" />
             Entrevistas
             <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
-              activeTab === 'entrevistas' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-700 text-slate-300'
+              activeTab === 'entrevistas' ? 'bg-accent/20 text-accent-foreground' : 'bg-white/10 text-primary-foreground/70'
             }`}>
               {entrevistas.length}
             </span>
@@ -207,7 +207,7 @@ export default function Informe() {
             <Compass className="h-4 w-4" />
             Orientaciones
             <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${
-              activeTab === 'orientaciones' ? 'bg-amber-100 text-amber-700' : 'bg-slate-700 text-slate-300'
+              activeTab === 'orientaciones' ? 'bg-accent/20 text-accent-foreground' : 'bg-white/10 text-primary-foreground/70'
             }`}>
               {orientaciones.length}
             </span>
@@ -237,7 +237,7 @@ export default function Informe() {
             {activeTab === 'entrevistas' ? (
               <Button
                 onClick={() => navigate('/registro-paciente')}
-                className="bg-[#0f172a] hover:bg-indigo-600 text-white font-bold uppercase text-xs tracking-wide"
+                className="font-bold uppercase text-xs tracking-wide"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Nuevo Paciente
@@ -245,7 +245,7 @@ export default function Informe() {
             ) : (
               <Button
                 onClick={() => navigate('/registro-paciente-externo')}
-                className="bg-[#0f172a] hover:bg-indigo-600 text-white font-bold uppercase text-xs tracking-wide"
+                className="font-bold uppercase text-xs tracking-wide"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Nueva Orientacion

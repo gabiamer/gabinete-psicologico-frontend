@@ -39,6 +39,7 @@ export interface FormData {
   derivadoPor: string;
   psicologoId: number | '';
   carreraId?: number;
+  fechaRegistro?: string;
 }
 
 // src/types/types.ts
@@ -91,6 +92,7 @@ export interface AntecedentesData {
   acuerdosEstablecidos: string;
   proximaSesionFecha: string;
   proximaSesionHora: string;
+  fechaRegistro?: string;
 }
 
 
@@ -147,6 +149,7 @@ export interface OrientacionVocacionalData {
   tipoTrabajosDeseados: string;
 
   observacionesEntrevistador: string;
+  fechaRegistro?: string;
 }
 
 export interface Carrera {

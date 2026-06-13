@@ -1,6 +1,7 @@
 // src/components/pacientes/FormHistoriaClinica.tsx
 import React from 'react';
 import { FormField } from '../shared/FormField';
+import { Textarea } from '@/components/ui/textarea';
 import type { AntecedentesData } from '../../types/types';
 
 interface Props {
@@ -22,15 +23,15 @@ export const FormHistoriaClinica: React.FC<Props> = ({
       </div>
 
       <FormField label="Historia Clínica">
-        <textarea
+        <Textarea
           name="historiaClinica"
           value={antecedentes.historiaClinica || ''}
           onChange={handleChange}
-          className="textarea-academic"
           rows={12}
           placeholder="Escriba aquí la historia clínica del paciente..."
           readOnly={readOnly}
           disabled={readOnly}
+          className="resize-y"
         />
       </FormField>
     </section>

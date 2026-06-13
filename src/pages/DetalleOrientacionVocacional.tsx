@@ -175,7 +175,7 @@ const DetalleOrientacionVocacional: React.FC = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
               <div>
-                <h4 style={{ marginBottom: '12px', color: '#0f172a' }}>Cualidades</h4>
+                <h4 style={{ marginBottom: '12px' }} className="text-foreground font-semibold text-sm">Cualidades</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <input type="text" value={respuestas.cualidad1 || ''} className="input-academic" readOnly disabled style={{ backgroundColor: '#f1f5f9' }} />
                   <input type="text" value={respuestas.cualidad2 || ''} className="input-academic" readOnly disabled style={{ backgroundColor: '#f1f5f9' }} />
@@ -183,7 +183,7 @@ const DetalleOrientacionVocacional: React.FC = () => {
                 </div>
               </div>
               <div>
-                <h4 style={{ marginBottom: '12px', color: '#0f172a' }}>Defectos</h4>
+                <h4 style={{ marginBottom: '12px' }} className="text-foreground font-semibold text-sm">Defectos</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <input type="text" value={respuestas.defecto1 || ''} className="input-academic" readOnly disabled style={{ backgroundColor: '#f1f5f9' }} />
                   <input type="text" value={respuestas.defecto2 || ''} className="input-academic" readOnly disabled style={{ backgroundColor: '#f1f5f9' }} />

@@ -9,6 +9,8 @@ import { FormEstudios } from '../components/orientacion/FormEstudios';
 import { FormObjetivosProfesionales } from '../components/orientacion/FormObjetivosProfesionales';
 import './RegistroPaciente.css';
 import { pacienteExternoService } from '../services/pacienteExternoService';
+import { FormField } from '../components/shared/FormField';
+import { Input } from '@/components/ui/input';
 
 const PASOS = [
     { numero: 1, label: 'Datos Personales' },
@@ -93,7 +95,8 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
         apoyoFamiliar: '',
         visionCincoAnos: '',
         tipoTrabajosDeseados: '',
-        observacionesEntrevistador: ''
+        observacionesEntrevistador: '',
+        fechaRegistro: new Date().toISOString().split('T')[0]
     });
 
     const [mensaje, setMensaje] = useState('');
@@ -305,6 +308,13 @@ const EntrevistaOrientacionVocacional: React.FC = () => {
                             handleChangeFormData={handleChangeFormData}
                             handleChangeOrientacion={handleChangeOrientacion}
                         />
+                        <FormField label="Fecha de la Orientación" required>
+                            <Input
+                                type="date"
+                                value={orientacion.fechaRegistro || ''}
+                                onChange={(e) => setOrientacion(prev => ({ ...prev, fechaRegistro: e.target.value }))}
+                            />
+                        </FormField>
                         <div className="actions-footer">
                             <button type="button" onClick={() => navigate('/')} className="btn-cancel">
                                 Cancelar

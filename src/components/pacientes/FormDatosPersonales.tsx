@@ -141,7 +141,7 @@ export const FormDatosPersonales: React.FC<Props> = ({
             />
           </FormField>
         </div>
-        <p style={{ fontSize: '13px', color: '#64748b', marginTop: '4px', fontStyle: 'italic' }}>
+        <p className="text-xs text-muted-foreground mt-1 italic">
           * Al menos un apellido es obligatorio
         </p>
       </section>
@@ -168,9 +168,8 @@ export const FormDatosPersonales: React.FC<Props> = ({
               value={formData.edad}
               readOnly
               className="input-academic"
-              style={{ backgroundColor: '#f1f5f9', cursor: 'not-allowed' }}
             />
-            <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>
+            <p className="text-xs text-muted-foreground mt-1">
               Se calcula automáticamente
             </p>
           </FormField>
@@ -202,7 +201,7 @@ export const FormDatosPersonales: React.FC<Props> = ({
             />
           </FormField>
         </div>
-        <div style={{ marginTop: '32px' }}>
+        <div className="mt-8">
           <FormField label="Domicilio Actual" required>
             <input
               type="text"
@@ -266,14 +265,8 @@ export const FormDatosPersonales: React.FC<Props> = ({
 
         {/* Modal para agregar nueva carrera */}
         {mostrarOtraCarrera && (
-          <div style={{
-            marginTop: '24px',
-            padding: '20px',
-            backgroundColor: '#fffbeb',
-            border: '2px solid #fbbf24',
-            borderRadius: '8px'
-          }}>
-            <h4 style={{ margin: '0 0 16px 0', color: '#92400e', fontWeight: '600' }}>
+          <div className="mt-6 p-5 bg-accent/10 border-2 border-accent/40 rounded-lg">
+            <h4 className="text-sm font-semibold text-foreground mb-4">
               ➕ Agregar nueva carrera
             </h4>
 
@@ -306,12 +299,11 @@ export const FormDatosPersonales: React.FC<Props> = ({
 
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+            <div className="flex gap-3 mt-4">
               <button
                 type="button"
                 onClick={handleAgregarCarrera}
-                className="btn-submit"
-                style={{ flex: 1, backgroundColor: '#10b981' }}
+                className="btn-submit flex-1"
               >
                 ✓ Guardar carrera
               </button>
@@ -321,8 +313,7 @@ export const FormDatosPersonales: React.FC<Props> = ({
                   setMostrarOtraCarrera(false);
                   setNuevaCarrera('');
                 }}
-                className="btn-submit"
-                style={{ flex: 1, backgroundColor: '#64748b' }}
+                className="btn-cancel flex-1"
               >
                 Cancelar
               </button>
@@ -330,7 +321,7 @@ export const FormDatosPersonales: React.FC<Props> = ({
           </div>
         )}
 
-        <div style={{ marginTop: '24px' }}>
+        <div className="mt-6">
           <FormField label="Remitido por">
             <input
               type="text"
@@ -363,8 +354,7 @@ export const FormDatosPersonales: React.FC<Props> = ({
               className="input-academic"
               autoComplete="off"
               disabled={disablePsicologo}
-              style={disablePsicologo ? { backgroundColor: '#f1f5f9', cursor: 'not-allowed' } : undefined}
-            />
+              />
             {showSugerencias && (
               <div className="suggestions-list">
                 {fetchingPsicologos ? (

@@ -322,7 +322,7 @@ export default function HistorialPaciente() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col">
-        <header className="bg-[#0f172a] text-white px-8 py-4 flex-shrink-0 flex items-center gap-4">
+        <header className="bg-primary text-primary-foreground px-8 py-4 flex-shrink-0 flex items-center gap-4">
           <button onClick={() => navigate('/informe')} className="text-slate-400 hover:text-white transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -489,7 +489,7 @@ export default function HistorialPaciente() {
                   size="sm"
                   onClick={generarResumenIA}
                   disabled={generandoIA}
-                  className="gap-1.5 text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                  className="gap-1.5 text-primary border-primary/30 hover:bg-primary/5"
                 >
                   {generandoIA
                     ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generando...</>

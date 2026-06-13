@@ -1,8 +1,18 @@
 // src/components/pacientes/FormEvaluacion.tsx
 import React, { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import type { AntecedentesData } from '../../types/types';
 
 const TIPOLOGIAS = ['Estrés', 'Baja autoestima', 'Ansiedad', 'Depresión', 'Problemas familiares', 'Problemas académicos'];
+
+const GRAVEDAD_OPTIONS = [
+  { valor: 'leve',     label: 'Leve',     color: '#10b981', descripcion: 'Síntomas manejables, intervención estándar' },
+  { valor: 'moderado', label: 'Moderado', color: '#f59e0b', descripcion: 'Requiere atención regular y seguimiento' },
+  { valor: 'grave',    label: 'Grave',    color: '#ef4444', descripcion: 'Requiere derivación o intervención especializada' },
+];
 
 interface Props {
   antecedentes: AntecedentesData;
@@ -15,23 +25,18 @@ export const FormEvaluacion: React.FC<Props> = ({ antecedentes, setAntecedentes,
 
   const toggleTipologia = (tipologia: string) => {
     if (readOnly) return;
-    const tipologiasActuales = antecedentes.tipologias || [];
-    if (tipologiasActuales.includes(tipologia)) {
-      setAntecedentes(prev => ({
-        ...prev,
-        tipologias: tipologiasActuales.filter(t => t !== tipologia)
-      }));
-    } else {
-      setAntecedentes(prev => ({
-        ...prev,
-        tipologias: [...tipologiasActuales, tipologia]
-      }));
-    }
+    const actuales = antecedentes.tipologias || [];
+    setAntecedentes(prev => ({
+      ...prev,
+      tipologias: actuales.includes(tipologia)
+        ? actuales.filter(t => t !== tipologia)
+        : [...actuales, tipologia]
+    }));
   };
 
-  const agregarOtraTipologia = () => {
-    if (readOnly) return;
-    if (otraTipologia.trim() && !(antecedentes.tipologias || []).includes(otraTipologia.trim())) {
+  const agregarOtra = () => {
+    if (readOnly || !otraTipologia.trim()) return;
+    if (!(antecedentes.tipologias || []).includes(otraTipologia.trim())) {
       setAntecedentes(prev => ({
         ...prev,
         tipologias: [...(prev.tipologias || []), otraTipologia.trim()]
@@ -57,46 +62,38 @@ export const FormEvaluacion: React.FC<Props> = ({ antecedentes, setAntecedentes,
         </div>
 
         {!readOnly && (
-          <p style={{ marginBottom: '16px', color: '#64748b' }}>
+          <p className="mb-4 text-muted-foreground text-sm">
             Seleccione el nivel de gravedad del caso basándose en la evaluación realizada:
           </p>
         )}
 
-        <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
-          {[
-            { valor: 'leve', label: 'Leve', color: '#10b981', descripcion: 'Síntomas manejables, intervención estándar' },
-            { valor: 'moderado', label: 'Moderado', color: '#f59e0b', descripcion: 'Requiere atención regular y seguimiento' },
-            { valor: 'grave', label: 'Grave', color: '#ef4444', descripcion: 'Requiere derivación o intervención especializada' }
-          ].map(({ valor, label, color, descripcion }) => (
+        <div className="flex gap-4 mt-4">
+          {GRAVEDAD_OPTIONS.map(({ valor, label, color, descripcion }) => (
             <label
               key={valor}
-              style={{
-                flex: 1,
-                padding: '20px',
-                border: `3px solid ${antecedentes.gravedad === valor ? color : '#e2e8f0'}`,
-                borderRadius: '12px',
-                cursor: readOnly ? 'default' : 'pointer',
-                textAlign: 'center',
-                backgroundColor: antecedentes.gravedad === valor ? `${color}15` : '#ffffff',
-                transition: 'all 0.2s',
-                opacity: readOnly ? 0.7 : 1
-              }}
+              className={cn(
+                'flex-1 p-5 rounded-xl border-2 text-center transition-all',
+                readOnly ? 'cursor-default opacity-75' : 'cursor-pointer',
+                antecedentes.gravedad === valor
+                  ? 'border-current'
+                  : 'border-border bg-background hover:border-muted-foreground/40'
+              )}
+              style={antecedentes.gravedad === valor ? {
+                borderColor: color,
+                backgroundColor: `${color}15`,
+              } : {}}
             >
               <input
                 type="radio"
                 name="gravedad"
                 value={valor}
                 checked={antecedentes.gravedad === valor}
-                onChange={(e) => !readOnly && setAntecedentes(prev => ({ ...prev, gravedad: e.target.value as any }))}
-                style={{ display: 'none' }}
+                onChange={(e) => !readOnly && setAntecedentes(prev => ({ ...prev, gravedad: e.target.value as AntecedentesData['gravedad'] }))}
+                className="sr-only"
                 disabled={readOnly}
               />
-              <div style={{ fontWeight: '700', fontSize: '18px', marginBottom: '8px', color }}>
-                {label}
-              </div>
-              <div style={{ fontSize: '13px', color: '#64748b' }}>
-                {descripcion}
-              </div>
+              <div className="font-bold text-lg mb-2" style={{ color }}>{label}</div>
+              <div className="text-xs text-muted-foreground">{descripcion}</div>
             </label>
           ))}
         </div>
@@ -109,97 +106,72 @@ export const FormEvaluacion: React.FC<Props> = ({ antecedentes, setAntecedentes,
         </div>
 
         {!readOnly && (
-          <p style={{ marginBottom: '16px', color: '#64748b' }}>
+          <p className="mb-4 text-muted-foreground text-sm">
             Seleccione las problemáticas principales identificadas (puede seleccionar múltiples):
           </p>
         )}
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
-          {TIPOLOGIAS.map((tipo) => (
-            <label
-              key={tipo}
-              style={{
-                padding: '12px 20px',
-                border: `2px solid ${(antecedentes.tipologias || []).includes(tipo) ? '#3b82f6' : '#e2e8f0'}`,
-                borderRadius: '24px',
-                cursor: readOnly ? 'default' : 'pointer',
-                fontWeight: '500',
-                backgroundColor: (antecedentes.tipologias || []).includes(tipo) ? '#eff6ff' : '#ffffff',
-                transition: 'all 0.2s',
-                opacity: readOnly ? 0.8 : 1
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={(antecedentes.tipologias || []).includes(tipo)}
-                onChange={() => toggleTipologia(tipo)}
-                style={{ marginRight: '8px' }}
-                disabled={readOnly}
-              />
-              {tipo}
-            </label>
-          ))}
+        <div className="flex flex-wrap gap-3 mt-4">
+          {TIPOLOGIAS.map((tipo) => {
+            const activo = (antecedentes.tipologias || []).includes(tipo);
+            return (
+              <label
+                key={tipo}
+                className={cn(
+                  'flex items-center gap-2 px-5 py-2.5 rounded-full border-2 font-medium text-sm transition-all',
+                  readOnly ? 'cursor-default opacity-80' : 'cursor-pointer',
+                  activo
+                    ? 'border-primary bg-primary/10 text-primary'
+                    : 'border-border bg-background text-foreground hover:border-primary/40'
+                )}
+              >
+                <input
+                  type="checkbox"
+                  checked={activo}
+                  onChange={() => toggleTipologia(tipo)}
+                  className="sr-only"
+                  disabled={readOnly}
+                />
+                {tipo}
+              </label>
+            );
+          })}
         </div>
 
         {!readOnly && (
-          <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
-            <input
-              type="text"
+          <div className="mt-6 flex gap-3">
+            <Input
               value={otraTipologia}
               onChange={(e) => setOtraTipologia(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), agregarOtraTipologia())}
+              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), agregarOtra())}
               placeholder="Agregar otra tipología..."
-              className="input-academic"
-              style={{ flex: 1 }}
+              className="flex-1"
             />
-            <button
-              type="button"
-              onClick={agregarOtraTipologia}
-              className="btn-submit"
-              style={{ minWidth: '120px' }}
-            >
+            <Button type="button" onClick={agregarOtra} variant="secondary">
               + Agregar
-            </button>
+            </Button>
           </div>
         )}
 
         {(antecedentes.tipologias || []).filter(t => !TIPOLOGIAS.includes(t)).length > 0 && (
-          <div style={{ marginTop: '16px' }}>
-            <p style={{ fontWeight: '600', marginBottom: '8px', fontSize: '14px', color: '#64748b' }}>
+          <div className="mt-4">
+            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">
               Tipologías personalizadas:
             </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <div className="flex flex-wrap gap-2">
               {(antecedentes.tipologias || []).filter(t => !TIPOLOGIAS.includes(t)).map((tipo) => (
-                <span
-                  key={tipo}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#f1f5f9',
-                    borderRadius: '16px',
-                    fontSize: '14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
-                >
+                <Badge key={tipo} variant="secondary" className="gap-2 pl-3 pr-2 py-1.5 text-sm">
                   {tipo}
                   {!readOnly && (
                     <button
                       type="button"
                       onClick={() => eliminarTipologia(tipo)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#ef4444',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        fontSize: '18px'
-                      }}
+                      className="text-destructive hover:text-destructive/80 font-bold text-base leading-none"
                     >
                       ×
                     </button>
                   )}
-                </span>
+                </Badge>
               ))}
             </div>
           </div>

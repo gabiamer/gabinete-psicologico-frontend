@@ -11,11 +11,12 @@ interface AccionCardProps {
 }
 
 const colorMap: Record<ColorScheme, { bg: string; iconBg: string; iconColor: string; hover: string }> = {
+  // Azul UCB
   indigo: {
-    bg: 'bg-white border-indigo-100 hover:border-indigo-400',
-    iconBg: 'bg-indigo-100',
-    iconColor: 'text-indigo-600',
-    hover: 'hover:shadow-indigo-100',
+    bg: 'bg-white border-primary/20 hover:border-primary/60',
+    iconBg: 'bg-primary/10',
+    iconColor: 'text-primary',
+    hover: 'hover:shadow-primary/10',
   },
   emerald: {
     bg: 'bg-white border-emerald-100 hover:border-emerald-400',
@@ -23,17 +24,18 @@ const colorMap: Record<ColorScheme, { bg: string; iconBg: string; iconColor: str
     iconColor: 'text-emerald-600',
     hover: 'hover:shadow-emerald-100',
   },
+  // Dorado UCB
   amber: {
-    bg: 'bg-white border-amber-100 hover:border-amber-400',
-    iconBg: 'bg-amber-100',
-    iconColor: 'text-amber-600',
-    hover: 'hover:shadow-amber-100',
+    bg: 'bg-white border-accent/30 hover:border-accent/70',
+    iconBg: 'bg-accent/15',
+    iconColor: 'text-accent-foreground',
+    hover: 'hover:shadow-accent/15',
   },
   slate: {
-    bg: 'bg-white border-slate-200 hover:border-slate-400',
-    iconBg: 'bg-slate-100',
-    iconColor: 'text-slate-600',
-    hover: 'hover:shadow-slate-100',
+    bg: 'bg-white border-border hover:border-muted-foreground/40',
+    iconBg: 'bg-muted',
+    iconColor: 'text-muted-foreground',
+    hover: 'hover:shadow-muted',
   },
   teal: {
     bg: 'bg-white border-teal-100 hover:border-teal-400',
@@ -65,8 +67,8 @@ export default function AccionCard({
         <Icon className={cn('h-8 w-8', colors.iconColor)} />
       </div>
       <div>
-        <p className="text-lg font-extrabold text-slate-900 uppercase tracking-tight">{title}</p>
-        <p className="text-sm text-slate-500 mt-1">{description}</p>
+        <p className="text-lg font-extrabold text-foreground uppercase tracking-tight">{title}</p>
+        <p className="text-sm text-muted-foreground mt-1">{description}</p>
       </div>
     </button>
   );

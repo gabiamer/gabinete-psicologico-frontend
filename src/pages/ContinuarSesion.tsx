@@ -67,11 +67,11 @@ export default function ContinuarSesion() {
         </Button>
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="bg-[#0f172a] px-8 py-6">
-            <h1 className="text-xl font-extrabold text-white uppercase tracking-tight">
+          <div className="bg-primary px-8 py-6">
+            <h1 className="text-xl font-extrabold text-primary-foreground uppercase tracking-tight">
               Continuar Sesion
             </h1>
-            <p className="text-sm text-slate-400 mt-1">
+            <p className="text-sm text-primary-foreground/60 mt-1">
               Selecciona el paciente para agregar una nueva sesion
             </p>
           </div>
@@ -109,7 +109,7 @@ export default function ContinuarSesion() {
               {pag.paginados.map((p) => (
                 <div
                   key={p.pacienteUniversitarioId}
-                  className="flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all"
+                  className="flex items-center justify-between px-4 py-3 rounded-xl border border-border hover:border-accent/50 hover:bg-accent/5 transition-all"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -130,7 +130,7 @@ export default function ContinuarSesion() {
                   <Button
                     onClick={() => navigate(`/pacientes/${p.pacienteUniversitarioId}/nueva-sesion`)}
                     size="sm"
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold ml-4 shrink-0"
+                    className="ml-4 shrink-0 font-semibold"
                   >
                     <FilePlus className="h-4 w-4 mr-1.5" />
                     Nueva Sesion

@@ -24,10 +24,15 @@ export default function AppSidebar({
   footer,
 }: AppSidebarProps) {
   return (
-    <aside className="w-72 flex-shrink-0 bg-[#0f172a] text-white flex flex-col">
-      <div className="p-6 border-b border-slate-700">
-        <h1 className="text-lg font-extrabold tracking-tight uppercase">{title}</h1>
-        <p className="text-xs text-slate-400 mt-1">{subtitle}</p>
+    <aside className="w-72 flex-shrink-0 bg-primary text-primary-foreground flex flex-col">
+      <div className="p-6 border-b border-white/15">
+        <div className="flex items-center gap-3 mb-1">
+          <img src="/UCB LOGO ESCUDOpng.png" alt="UCB" className="h-10 w-10 object-contain flex-shrink-0" />
+          <div>
+            <h1 className="text-sm font-extrabold tracking-tight uppercase leading-tight">{title}</h1>
+            <p className="text-xs text-primary-foreground/60 mt-0.5">{subtitle}</p>
+          </div>
+        </div>
       </div>
 
       <nav className="flex-1 p-4 space-y-1">
@@ -41,8 +46,8 @@ export default function AppSidebar({
               className={cn(
                 'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200',
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                  ? 'bg-accent text-accent-foreground shadow-lg shadow-accent/30'
+                  : 'text-primary-foreground/80 hover:bg-white/10 hover:text-primary-foreground'
               )}
             >
               <Icon className="h-5 w-5 flex-shrink-0" />
@@ -51,7 +56,7 @@ export default function AppSidebar({
                 <span
                   className={cn(
                     'text-xs px-2 py-0.5 rounded-full font-bold',
-                    isActive ? 'bg-white/20' : 'bg-slate-700'
+                    isActive ? 'bg-accent-foreground/20' : 'bg-white/15'
                   )}
                 >
                   {item.count}
@@ -62,9 +67,9 @@ export default function AppSidebar({
         })}
       </nav>
 
-      <div className="p-4 border-t border-slate-700">
+      <div className="p-4 border-t border-white/15">
         {footer ?? (
-          <div className="text-xs text-slate-500 text-center">UCB Tarija - Gabinete Psicologico</div>
+          <div className="text-xs text-primary-foreground/50 text-center">UCB Tarija — Gabinete Psicológico</div>
         )}
       </div>
     </aside>

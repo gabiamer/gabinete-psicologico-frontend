@@ -1,6 +1,8 @@
 // src/components/orientacion/FormDatosPersonalesOV.tsx
 import React from 'react';
 import { FormField } from '../shared/FormField';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import type { OrientacionVocacionalData, FormData } from '../../types/types';
 
 interface Props {
@@ -34,87 +36,40 @@ export const FormDatosPersonalesOV: React.FC<Props> = ({
 
                 <div className="grid-2-cols">
                     <FormField label="Nombre completo" required>
-                        <input
+                        <Input
                             type="text"
                             value={`${formData.primerNombre} ${formData.segundoNombre || ''} ${formData.apellidoPaterno} ${formData.apellidoMaterno || ''}`.trim()}
                             readOnly
-                            className="input-academic"
-                            style={{ backgroundColor: '#f1f5f9', cursor: 'not-allowed' }}
+                            disabled
                         />
                     </FormField>
 
                     <FormField label="Fecha de nacimiento" required>
-                        <input
-                            type="date"
-                            name="fechaNacimiento"
-                            value={formData.fechaNacimiento}
-                            onChange={handleChangeFormData}
-                            className="input-academic"
-                        />
+                        <Input type="date" name="fechaNacimiento" value={formData.fechaNacimiento} onChange={handleChangeFormData} />
                     </FormField>
 
                     <FormField label="Edad" required>
-                        <input
-                            type="number"
-                            name="edad"
-                            value={formData.edad}
-                            readOnly
-                            className="input-academic"
-                            style={{ backgroundColor: '#f1f5f9', cursor: 'not-allowed' }}
-                        />
+                        <Input type="number" name="edad" value={formData.edad} readOnly disabled />
                     </FormField>
 
                     <FormField label="Domicilio" required>
-                        <input
-                            type="text"
-                            name="domicilio"
-                            value={formData.domicilio}
-                            onChange={handleChangeFormData}
-                            className="input-academic"
-                        />
+                        <Input type="text" name="domicilio" value={formData.domicilio} onChange={handleChangeFormData} />
                     </FormField>
 
                     <FormField label="Correo electrónico">
-                        <input
-                            type="email"
-                            name="celular"
-                            value={formData.celular}
-                            onChange={handleChangeFormData}
-                            className="input-academic"
-                            placeholder="correo@ejemplo.com"
-                        />
+                        <Input type="email" name="celular" value={formData.celular} onChange={handleChangeFormData} placeholder="correo@ejemplo.com" />
                     </FormField>
 
                     <FormField label="Escuela / Colegio">
                         {onEscuelaChange ? (
-                            <input
-                                type="text"
-                                value={escuela ?? ''}
-                                onChange={(e) => onEscuelaChange(e.target.value)}
-                                className="input-academic"
-                                placeholder="Nombre de la escuela o colegio"
-                            />
+                            <Input type="text" value={escuela ?? ''} onChange={(e) => onEscuelaChange(e.target.value)} placeholder="Nombre de la escuela o colegio" />
                         ) : (
-                            <input
-                                type="text"
-                                value={escuela ?? ''}
-                                readOnly
-                                className="input-academic"
-                                style={{ backgroundColor: '#f1f5f9', cursor: 'not-allowed' }}
-                            />
+                            <Input type="text" value={escuela ?? ''} readOnly disabled />
                         )}
                     </FormField>
 
                     <FormField label="Año que cursa" required>
-                        <input
-                            type="number"
-                            name="semestre"
-                            value={formData.semestre}
-                            onChange={handleChangeFormData}
-                            className="input-academic"
-                            min="1"
-                            max="14"
-                        />
+                        <Input type="number" name="semestre" value={formData.semestre} onChange={handleChangeFormData} min={1} max={14} />
                     </FormField>
                 </div>
             </section>
@@ -125,14 +80,7 @@ export const FormDatosPersonalesOV: React.FC<Props> = ({
                     <span className="section-text">Motivo de Consulta</span>
                 </div>
                 <FormField label="Describe el motivo por el cual solicitas orientación vocacional" required>
-                    <textarea
-                        name="motivoConsulta"
-                        value={orientacion.motivoConsulta}
-                        onChange={handleChangeOrientacion}
-                        className="textarea-academic"
-                        rows={4}
-                        placeholder="Ej. Tengo dudas sobre qué carrera estudiar..."
-                    />
+                    <Textarea name="motivoConsulta" value={orientacion.motivoConsulta} onChange={handleChangeOrientacion} rows={4} placeholder="Ej. Tengo dudas sobre qué carrera estudiar..." />
                 </FormField>
             </section>
 
@@ -142,14 +90,7 @@ export const FormDatosPersonalesOV: React.FC<Props> = ({
                     <span className="section-text">Otras Actividades / Hobbies</span>
                 </div>
                 <FormField label="Describe tus actividades favoritas, pasatiempos e intereses">
-                    <textarea
-                        name="actividadesHobbies"
-                        value={orientacion.actividadesHobbies}
-                        onChange={handleChangeOrientacion}
-                        className="textarea-academic"
-                        rows={4}
-                        placeholder="Ej. Leer, hacer deporte, tocar guitarra..."
-                    />
+                    <Textarea name="actividadesHobbies" value={orientacion.actividadesHobbies} onChange={handleChangeOrientacion} rows={4} placeholder="Ej. Leer, hacer deporte, tocar guitarra..." />
                 </FormField>
             </section>
 
@@ -159,66 +100,30 @@ export const FormDatosPersonalesOV: React.FC<Props> = ({
                     <span className="section-text">Cualidades y Defectos</span>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
-                    <div>
-                        <h4 style={{ marginBottom: '16px', color: '#0f172a', fontWeight: '600' }}>Cualidades</h4>
+                <div className="grid grid-cols-2 gap-8">
+                    <div className="flex flex-col gap-4">
+                        <h4 className="text-sm font-semibold text-foreground">Cualidades</h4>
                         <FormField label="1. Primera cualidad">
-                            <input
-                                name="cualidad1"
-                                value={orientacion.cualidad1}
-                                onChange={handleChangeOrientacion}
-                                className="input-academic"
-                                placeholder="Ej. Responsable"
-                            />
+                            <Input name="cualidad1" value={orientacion.cualidad1} onChange={handleChangeOrientacion} placeholder="Ej. Responsable" />
                         </FormField>
                         <FormField label="2. Segunda cualidad">
-                            <input
-                                name="cualidad2"
-                                value={orientacion.cualidad2}
-                                onChange={handleChangeOrientacion}
-                                className="input-academic"
-                                placeholder="Ej. Creativo"
-                            />
+                            <Input name="cualidad2" value={orientacion.cualidad2} onChange={handleChangeOrientacion} placeholder="Ej. Creativo" />
                         </FormField>
                         <FormField label="3. Tercera cualidad">
-                            <input
-                                name="cualidad3"
-                                value={orientacion.cualidad3}
-                                onChange={handleChangeOrientacion}
-                                className="input-academic"
-                                placeholder="Ej. Empático"
-                            />
+                            <Input name="cualidad3" value={orientacion.cualidad3} onChange={handleChangeOrientacion} placeholder="Ej. Empático" />
                         </FormField>
                     </div>
 
-                    <div>
-                        <h4 style={{ marginBottom: '16px', color: '#0f172a', fontWeight: '600' }}>Defectos</h4>
+                    <div className="flex flex-col gap-4">
+                        <h4 className="text-sm font-semibold text-foreground">Defectos</h4>
                         <FormField label="1. Primer defecto">
-                            <input
-                                name="defecto1"
-                                value={orientacion.defecto1}
-                                onChange={handleChangeOrientacion}
-                                className="input-academic"
-                                placeholder="Ej. Impaciente"
-                            />
+                            <Input name="defecto1" value={orientacion.defecto1} onChange={handleChangeOrientacion} placeholder="Ej. Impaciente" />
                         </FormField>
                         <FormField label="2. Segundo defecto">
-                            <input
-                                name="defecto2"
-                                value={orientacion.defecto2}
-                                onChange={handleChangeOrientacion}
-                                className="input-academic"
-                                placeholder="Ej. Tímido"
-                            />
+                            <Input name="defecto2" value={orientacion.defecto2} onChange={handleChangeOrientacion} placeholder="Ej. Tímido" />
                         </FormField>
                         <FormField label="3. Tercer defecto">
-                            <input
-                                name="defecto3"
-                                value={orientacion.defecto3}
-                                onChange={handleChangeOrientacion}
-                                className="input-academic"
-                                placeholder="Ej. Distraído"
-                            />
+                            <Input name="defecto3" value={orientacion.defecto3} onChange={handleChangeOrientacion} placeholder="Ej. Distraído" />
                         </FormField>
                     </div>
                 </div>
@@ -230,14 +135,7 @@ export const FormDatosPersonalesOV: React.FC<Props> = ({
                     <span className="section-text">Temas de Interés</span>
                 </div>
                 <FormField label="¿Qué temas te gusta investigar o conocer más?">
-                    <textarea
-                        name="temasInteres"
-                        value={orientacion.temasInteres}
-                        onChange={handleChangeOrientacion}
-                        className="textarea-academic"
-                        rows={3}
-                        placeholder="Ej. Tecnología, historia, ciencia..."
-                    />
+                    <Textarea name="temasInteres" value={orientacion.temasInteres} onChange={handleChangeOrientacion} rows={3} placeholder="Ej. Tecnología, historia, ciencia..." />
                 </FormField>
             </section>
 
@@ -248,33 +146,14 @@ export const FormDatosPersonalesOV: React.FC<Props> = ({
                 </div>
                 <div className="grid-2-cols">
                     <FormField label="Ocupación de la madre">
-                        <input
-                            name="ocupacionMadre"
-                            value={orientacion.ocupacionMadre}
-                            onChange={handleChangeOrientacion}
-                            className="input-academic"
-                            placeholder="Ej. Profesora"
-                        />
+                        <Input name="ocupacionMadre" value={orientacion.ocupacionMadre} onChange={handleChangeOrientacion} placeholder="Ej. Profesora" />
                     </FormField>
                     <FormField label="Ocupación del padre">
-                        <input
-                            name="ocupacionPadre"
-                            value={orientacion.ocupacionPadre}
-                            onChange={handleChangeOrientacion}
-                            className="input-academic"
-                            placeholder="Ej. Ingeniero"
-                        />
+                        <Input name="ocupacionPadre" value={orientacion.ocupacionPadre} onChange={handleChangeOrientacion} placeholder="Ej. Ingeniero" />
                     </FormField>
                 </div>
                 <FormField label="Otras personas significativas y sus ocupaciones">
-                    <textarea
-                        name="ocupacionOtros"
-                        value={orientacion.ocupacionOtros}
-                        onChange={handleChangeOrientacion}
-                        className="textarea-academic"
-                        rows={2}
-                        placeholder="Ej. Hermano mayor - Médico, Tío - Arquitecto..."
-                    />
+                    <Textarea name="ocupacionOtros" value={orientacion.ocupacionOtros} onChange={handleChangeOrientacion} rows={2} placeholder="Ej. Hermano mayor - Médico, Tío - Arquitecto..." />
                 </FormField>
             </section>
         </>
